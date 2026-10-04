@@ -67,8 +67,9 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 /* ══ СЦЕНА: небо, солнце, храм ══ */
 #scene {
+  --strip: 32px;   /* полоса постройки внизу сцены */
   position:relative; flex:0 0 auto;
-  height:clamp(230px, 40vh, 340px);
+  height:clamp(250px, 40vh, 330px);
   overflow:hidden;
 }
 .sky { position:absolute; inset:0; opacity:0; transition:opacity 3s; }
@@ -108,9 +109,10 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 @keyframes drift { from{left:-120px} to{left:110%} }
 
 /* Солнце Ра — главная кнопка */
+/* Солнце встаёт прямо над постройкой и чуть заходит на неё — ближе к списку под большим пальцем */
 #sunwrap {
-  --sun: clamp(108px, 32vw, 146px);
-  position:absolute; left:50%; top:9%;
+  --sun: clamp(108px, 32vw, 140px);
+  position:absolute; left:50%; bottom:calc(var(--strip) + 30%);
   width:var(--sun); height:var(--sun); margin-left:calc(var(--sun) / -2);
   z-index:3;
 }
@@ -135,16 +137,15 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   border:2px solid rgba(255,250,220,.55);
 }
 #hint {
-  position:absolute; left:0; right:0; top:calc(9% + clamp(108px, 32vw, 146px) + 6px);
-  text-align:center; font-style:italic; font-size:16px; color:#fff;
-  text-shadow:0 1px 3px rgba(0,0,0,.55); z-index:3; pointer-events:none;
-  animation:pulse 2s ease-in-out infinite;
+  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+  text-align:center; font-style:italic; font-weight:700; font-size:16px; line-height:1.1; color:#8a4a00;
+  pointer-events:none; animation:pulse 2s ease-in-out infinite;
 }
 @keyframes pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
 
 .temple {
-  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-  height:48%; width:auto; max-width:100%; z-index:2; overflow:visible;
+  position:absolute; left:50%; bottom:var(--strip); transform:translateX(-50%);
+  height:44%; width:auto; max-width:100%; z-index:2; overflow:visible;
   transition:filter 3s;
 }
 #scene[data-phase=night] .temple { filter:brightness(.72) saturate(.85); }
@@ -161,7 +162,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .tl.glow { opacity:0; }
 .tl.glow.on { opacity:1; }
 
-.flowers { position:absolute; bottom:2px; font-size:20px; z-index:3; pointer-events:none; letter-spacing:-3px; }
+.flowers { position:absolute; bottom:calc(var(--strip) + 1px); font-size:20px; z-index:3; pointer-events:none; letter-spacing:-3px; }
 .flowers.l { left:6px; }
 .flowers.r { right:6px; }
 
@@ -178,23 +179,28 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .toast.out { opacity:0; transform:translateY(-8px); transition:all .4s; }
 @keyframes tin { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
 
-/* ══ Постройка эпохи ══ */
-#build { padding:8px 16px 4px; flex:0 0 auto; }
-.build-top { display:flex; align-items:baseline; gap:8px; font-size:15px; }
-#bname { font-family:'Forum', serif; color:var(--lgold); font-size:17px; }
+/* ══ Постройка эпохи — полоса на земле внизу сцены ══ */
+#build {
+  position:absolute; left:0; right:0; bottom:0; height:var(--strip); z-index:4;
+  padding:3px 12px 0; background:linear-gradient(180deg, rgba(20,12,4,.72), rgba(20,12,4,.92));
+}
+.build-top { display:flex; align-items:baseline; gap:8px; font-size:14px; line-height:1.15; }
+#bname { font-family:'Forum', serif; color:var(--lgold); font-size:15px; }
 #bstage { color:var(--dim); font-style:italic; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #bpct { font-family:'Forum', serif; color:var(--gold); }
-.bar { height:8px; border-radius:6px; background:#0d0803; border:1px solid var(--line); overflow:hidden; margin-top:4px; }
-#bfill { height:100%; width:0; border-radius:6px; background:linear-gradient(90deg, var(--dgold), var(--gold), #fff0a0); transition:width .6s; }
+.bar { height:5px; border-radius:4px; background:#0d0803; overflow:hidden; margin-top:3px; }
+#bfill { height:100%; width:0; border-radius:4px; background:linear-gradient(90deg, var(--dgold), var(--gold), #fff0a0); transition:width .6s; }
 
-/* ══ Лента комплимента ══ */
+/* ══ Комплимент — надпись в небе ══ */
 #ribbon {
-  flex:0 0 auto; margin:4px 12px 6px; padding:6px 12px; min-height:52px;
-  display:flex; align-items:center; justify-content:center; text-align:center;
-  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
-  background:linear-gradient(90deg, transparent, rgba(242,182,50,.08), transparent);
+  position:absolute; left:12px; right:12px; top:6px; z-index:4; pointer-events:none;
+  text-align:center; transition:opacity .4s;
 }
-#rtext { font-style:italic; font-weight:600; font-size:17px; line-height:1.25; color:var(--lgold); }
+#scene:has(.toast) #ribbon { opacity:0; }   /* всплывашка на месте комплимента — комплимент ждёт */
+#rtext {
+  font-style:italic; font-weight:700; font-size:16px; line-height:1.22; color:#fffaf0;
+  text-shadow:0 1px 3px rgba(50,25,0,.9), 0 0 14px rgba(50,25,0,.55);
+}
 #rtext { transition:opacity .8s ease, transform .8s ease; }
 #rtext.out { opacity:0; transform:translateY(4px); }
 @keyframes rin { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
@@ -305,7 +311,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 
 #mtext { white-space:pre-line; }
 #buff {
-  position:absolute; left:50%; bottom:6px; transform:translateX(-50%); z-index:4; white-space:pre;
+  position:absolute; left:50%; bottom:calc(var(--strip) + 6px); transform:translateX(-50%); z-index:5; white-space:pre;
   font-size:14px; color:#ffe6f0; background:rgba(40,20,10,.82); border:1px solid var(--rose); border-radius:12px; padding:2px 10px;
 }
 
@@ -368,7 +374,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
 .ach i { font-size:14px; color:var(--dim); }
 
 #btn-epoch {
-  display:block; margin:6px auto 0; padding:6px 18px; border-radius:12px;
+  position:absolute; left:50%; transform:translateX(-50%); bottom:calc(var(--strip) + 8px); z-index:5; white-space:nowrap;
+  padding:6px 18px; border-radius:12px;
   border:1px solid var(--gold); background:#3a2a0e; color:var(--lgold); font-size:16px;
   animation:pulse 1.6s ease-in-out infinite;
 }
@@ -410,8 +417,7 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     <div id="stars"></div>
     <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
 
-    <div id="sunwrap"><div class="rays"></div><div id="sun" role="button" aria-label="Солнце Ра"></div></div>
-    <div id="hint">коснись солнца</div>
+    <div id="sunwrap"><div class="rays"></div><div id="sun" role="button" aria-label="Солнце Ра"></div><div id="hint">коснись<br>солнца</div></div>
 
     <svg class="temple" viewBox="0 0 240 120" aria-hidden="true">
       <defs>
@@ -554,17 +560,15 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
     </svg>
 
     <div class="flowers l">🌸🌼</div><div class="flowers r">🌷🌸</div>
+    <div id="ribbon"><span id="rtext"></span></div>
+    <div id="build">
+      <div class="build-top"><span id="bname">Храм Солнца</span><span id="bstage"></span><span id="bpct">0%</span></div>
+      <div class="bar"><div id="bfill"></div></div>
+    </div>
+    <button id="btn-epoch" style="display:none">✨ Начать новую эпоху</button>
     <div id="toasts"></div>
     <div id="buff" style="display:none"></div>
   </section>
-
-  <div id="build">
-    <div class="build-top"><span id="bname">Храм Солнца</span><span id="bstage"></span><span id="bpct">0%</span></div>
-    <div class="bar"><div id="bfill"></div></div>
-    <button id="btn-epoch" style="display:none">✨ Начать новую эпоху</button>
-  </div>
-
-  <div id="ribbon"><span id="rtext"></span></div>
 
   <main id="panels">
     <section class="panel on" id="p-fol">
@@ -843,6 +847,7 @@ GIFTS.forEach(g => GIFT_BY_ID[g.id] = g);
 // ЭПОХИ. Цели подобраны симуляцией с событиями и достижениями (balance_sim.py):
 // первая ≈1 ч у идеального игрока (у живого 1,5–2,5 ч) за 2 дня, дальше дольше.
 const EPOCH_GOAL0 = 4e11, EPOCH_GOAL_MULT = 8;
+const BUILD_ROOT = 6;          // как показывать постройку: (золото / цель) ^ (1/6)
 const GRACE_PER_EPOCH = 0.5;   // Благодать: +50% ко всему доходу за каждую пройденную эпоху
 const STAGE_P = [0, .03, .12, .22, .32, .42, .52, .62, .74, .84, .93, 1];   // совпадают со слоями картинки
 const EPOCHS = [
@@ -1310,7 +1315,9 @@ function updateTop() {
 let lastStage = -1;
 function updateBuild(announce) {
   const ep = epochInfo(G.ep);
-  const p = Math.min(1, G.ge / ep.goal);
+  // Золото растёт лавиной: в прямых процентах храм стоял бы на 0% почти всю эпоху.
+  // Корень 6-й степени по симуляции идёт вровень со временем игры (10 мин ≈ 20%, полчаса ≈ 57%).
+  const p = Math.pow(Math.min(1, G.ge / ep.goal), 1 / BUILD_ROOT);
   let si = 0;
   STAGE_P.forEach((sp, k) => { if (p >= sp) si = k; });
   setT($('bname'), ep.name);
