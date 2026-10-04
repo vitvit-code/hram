@@ -195,7 +195,8 @@ button { font:inherit; color:inherit; background:none; border:none; cursor:point
   background:linear-gradient(90deg, transparent, rgba(242,182,50,.08), transparent);
 }
 #rtext { font-style:italic; font-weight:600; font-size:17px; line-height:1.25; color:var(--lgold); }
-#rtext.in { animation:rin .6s ease-out; }
+#rtext { transition:opacity .8s ease, transform .8s ease; }
+#rtext.out { opacity:0; transform:translateY(4px); }
 @keyframes rin { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
 
 /* ══ Панели ══ */
@@ -1152,11 +1153,20 @@ function renderBook() {
     list.appendChild(d);
   }
 }
+// Комплимент меняется спокойно: раз в COMPLIMENT_SEC (Виталь: игра расслабляющая, чтобы успевала прочитать),
+// а сразу — только в особый момент (поймала посланника, новая эпоха)
+const COMPLIMENT_SEC = 55;
+let complimentAt = 0, complimentFade = null;
 function showCompliment() {
   const el = $('rtext');
-  el.classList.remove('in'); void el.offsetWidth;
-  el.textContent = nextCompliment();
-  el.classList.add('in');
+  complimentAt = Date.now();
+  if (!el.textContent) { el.textContent = nextCompliment(); return; }
+  clearTimeout(complimentFade);
+  el.classList.add('out');
+  complimentFade = setTimeout(() => { el.textContent = nextCompliment(); el.classList.remove('out'); }, 800);
+}
+function maybeCompliment() {
+  if (!document.hidden && Date.now() - complimentAt >= COMPLIMENT_SEC * 1000) showCompliment();
 }
 
 // ══════════════════════════════════════════════
@@ -1170,7 +1180,6 @@ function tapSun(x, y) {
   floatNum('+' + fmt(gain, true), x, y);
   haptic('tap');
   $('sun').animate([{ transform:'scale(.93)' }, { transform:'scale(1)' }], { duration:160, easing:'ease-out' });
-  if (G.c % 10 === 0) showCompliment();
   if (G.c % TAP_CARD_EVERY === 0 && Math.random() < TAP_CARD_CHANCE) dropHymn();
   if (G.c === 5) $('hint').style.display = 'none';
   updateTop();
@@ -1523,6 +1532,7 @@ function catchEvent(el, scarab, x, y) {
   }
   haptic('event');
   recalc();
+  showCompliment();
   if (Math.random() < EVENT_CARD_CHANCE) setTimeout(dropHymn, 900);
   updateAll();
   markDirty();
@@ -1736,7 +1746,7 @@ function start() {
     lastTick = performance.now();
     setInterval(tick, 100);
     setInterval(() => { updateBuild(true); updateFollowers(); updateGifts(); updateTempleTab(); updateBuffLine(); }, 250);
-    setInterval(() => { maybeEvent(); checkAchievements(); renderBook(); renderAchievements(); }, 1000);
+    setInterval(() => { maybeEvent(); maybeCompliment(); checkAchievements(); renderBook(); renderAchievements(); }, 1000);
     setInterval(updateSky, 60000);
     setInterval(saveNow, 30000);
     $('loading').classList.add('out');
