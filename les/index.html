@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b170e">
+<title>Лес Богини Жени</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kurale&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0b170e;
+  --panel:  #10200f;
+  --card:   #14271a;
+  --card2:  #1b3322;
+  --line:   #2f4d33;
+  --gold:   #f2b632;
+  --lgold:  #ffe08a;
+  --dgold:  #9a6a10;
+  --ink:    #f3f1dc;
+  --sand:   #d6e4ae;
+  --dim:    #9db48a;
+  --rose:   #f6a5c0;
+  --skyblue:#7cc4f0;
+  --ground: #5f9447;
+  --sat: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+  --sab: calc(var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px));
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+* { -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+html, body { height:100%; overflow:hidden; background:#060d07; touch-action:manipulation; }
+body {
+  font-family:'Cormorant Garamond', Georgia, serif; font-weight:600;
+  color:var(--ink);
+  background: radial-gradient(ellipse at 50% 30%, #13281a 0%, #060d07 70%);
+}
+button { font:inherit; color:inherit; background:none; border:none; cursor:pointer; touch-action:manipulation; }
+
+/* ══ КАРКАС ══ */
+#app {
+  position:fixed; top:0; bottom:0; left:0; right:0; margin:0 auto;
+  width:100%; max-width:480px;
+  display:flex; flex-direction:column;
+  background:var(--bg);
+  padding-top:var(--sat);
+  box-shadow:0 0 60px rgba(0,0,0,.6);
+  overflow:hidden;
+}
+
+/* ══ ВЕРХ: золото ══ */
+#top { padding:8px 16px 6px; text-align:center; flex:0 0 auto; }
+.gold-line { display:flex; align-items:center; justify-content:center; gap:10px; }
+.coin {
+  width:22px; height:22px; border-radius:50%; flex:0 0 auto;
+  background:radial-gradient(circle at 35% 35%, #fff4c0 0%, #ffd34d 35%, #d18b0c 100%);
+  box-shadow:0 0 10px rgba(255,190,40,.6), inset 0 0 0 2px rgba(150,90,0,.45);
+}
+#gold {
+  font-family:'Kurale', serif; font-size:34px; line-height:1.1; color:var(--lgold);
+  text-shadow:0 0 18px rgba(255,190,40,.45);
+}
+.sub-line { font-size:15px; color:var(--dim); display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+.sub-line b { font-family:'Kurale', serif; font-weight:400; color:var(--sand); font-size:16px; }
+
+/* ══ СЦЕНА: небо, солнце, храм ══ */
+#scene {
+  --strip: 32px;   /* полоса постройки внизу сцены */
+  position:relative; flex:0 0 auto;
+  height:clamp(270px, 42vh, 340px);
+  overflow:hidden;
+}
+.sky { position:absolute; inset:0; opacity:0; transition:opacity 3s; }
+.s-dawn   { background:linear-gradient(180deg, #4a5aa0 0%, #c98bb0 45%, #ffc99a 80%, #ffe2b0 100%); }
+.s-day    { background:linear-gradient(180deg, #3d9ae6 0%, #74c0f2 50%, #bfe6ff 85%, #e2f5ff 100%); }
+.s-sunset { background:linear-gradient(180deg, #2f2c74 0%, #8d4f8f 38%, #e8707a 68%, #ffb06a 100%); }
+.s-night  { background:linear-gradient(180deg, #050920 0%, #10164a 55%, #2a2463 100%); }
+#scene[data-phase=dawn]   .s-dawn,
+#scene[data-phase=day]    .s-day,
+#scene[data-phase=sunset] .s-sunset,
+#scene[data-phase=night]  .s-night { opacity:1; }
+
+#stars { position:absolute; inset:0; opacity:0; transition:opacity 3s; pointer-events:none; }
+#scene[data-phase=night] #stars { opacity:1; }
+#scene[data-phase=dawn] #stars, #scene[data-phase=sunset] #stars { opacity:.25; }
+.star {
+  position:absolute; border-radius:50%; background:#fff8dc;
+  animation:twinkle var(--d,4s) var(--delay,0s) ease-in-out infinite;
+}
+@keyframes twinkle { 0%,100%{opacity:.15} 50%{opacity:var(--o,.9)} }
+
+.cloud {
+  position:absolute; height:26px; border-radius:20px;
+  background:rgba(255,255,255,.75);
+  opacity:0; transition:opacity 3s; pointer-events:none;
+  animation:drift linear infinite;
+}
+.cloud::before, .cloud::after { content:''; position:absolute; background:inherit; border-radius:50%; }
+.cloud::before { width:46%; height:180%; left:16%; bottom:20%; }
+.cloud::after  { width:34%; height:140%; right:14%; bottom:25%; }
+.c1 { width:90px;  top:16%; animation-duration:95s;  animation-delay:-20s; }
+.c2 { width:64px;  top:34%; animation-duration:120s; animation-delay:-75s; transform:scale(.8); }
+.c3 { width:76px;  top:8%;  animation-duration:140s; animation-delay:-110s; }
+#scene[data-phase=day] .cloud { opacity:.9; }
+#scene[data-phase=dawn] .cloud { opacity:.55; }
+#scene[data-phase=sunset] .cloud { opacity:.35; }
+@keyframes drift { from{left:-120px} to{left:110%} }
+
+/* Солнце Ра — главная кнопка */
+/* Солнце небольшое и висит над храмом, не закрывая его: храм — главная награда */
+#sunwrap {
+  --sun: clamp(74px, 21vw, 90px);
+  position:absolute; left:50%; top:50px;
+  width:var(--sun); height:var(--sun); margin-left:calc(var(--sun) / -2);
+  z-index:4;
+}
+.rays {
+  position:absolute; left:50%; top:50%; width:200%; height:200%; margin:-100% 0 0 -100%;
+  border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, rgba(255,236,150,.55) 0deg 5deg, rgba(255,236,150,0) 5deg 18deg);
+  -webkit-mask:radial-gradient(circle, #000 28%, transparent 68%);
+          mask:radial-gradient(circle, #000 28%, transparent 68%);
+  animation:spin 50s linear infinite;
+  pointer-events:none;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+#sun {
+  position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 40% 36%, #fffbe8 0%, #ffe58a 26%, #f9bd33 60%, #e48c0e 100%);
+  box-shadow:0 0 28px 8px rgba(255,205,70,.6), 0 0 70px 26px rgba(255,180,40,.28), inset 0 -6px 14px rgba(190,90,0,.35);
+  touch-action:none; cursor:pointer;
+}
+#sun::after {
+  content:''; position:absolute; inset:10%; border-radius:50%;
+  border:2px solid rgba(255,250,220,.55);
+}
+#hint {
+  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+  text-align:center; font-style:italic; font-weight:700; font-size:14px; line-height:1.1; color:#8a4a00;
+  pointer-events:none; animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+
+.temple {
+  position:absolute; left:50%; bottom:var(--strip); transform:translateX(-50%);
+  height:calc(100% - var(--strip) - 152px); width:auto; max-width:100%; z-index:2; overflow:visible;
+  transition:filter 3s;
+}
+/* ночью храм не тёмный силуэт, а в тёплом свете факелов */
+#scene[data-phase=night] .temple { filter:brightness(.95) drop-shadow(0 0 7px rgba(255,190,110,.45)); }
+#scene[data-phase=night] { --ground:#28452c; }
+#scene[data-phase=sunset] { --ground:#5b7a3c; }
+.temple .ep { display:none; }
+.temple[data-ep="0"] #ep0, .temple[data-ep="star"] #ep1,
+.temple[data-ep="1"] #ep1, .temple[data-ep="2"] #ep2, .temple[data-ep="3"] #ep3, .temple[data-ep="4"] #ep4 { display:inline; }
+.temple[data-ep="star"] #ep1 { filter:hue-rotate(110deg) saturate(1.3) brightness(1.15); }
+.temple[data-ep="4"] .ground { fill:#2f5a40; }
+.tl { opacity:.16; transition:opacity 1s; }
+.tl.on { opacity:1; }
+/* только что построенная часть «вырастает» */
+.tl.pop { transform-box:fill-box; transform-origin:50% 100%; animation:grow 1.1s cubic-bezier(.34,1.56,.64,1); }
+@keyframes grow { from{transform:scale(.4); opacity:.2} to{transform:none; opacity:1} }
+
+/* Праздник новой стадии: золотая вспышка */
+#flash {
+  position:absolute; inset:0; z-index:4; pointer-events:none; opacity:0;
+  background:radial-gradient(ellipse at 50% 70%, rgba(255,240,170,.9) 0%, rgba(255,210,90,.35) 40%, rgba(255,200,80,0) 75%);
+}
+#flash.go { animation:flash 1.4s ease-out; }
+@keyframes flash { 0%{opacity:0} 15%{opacity:1} 100%{opacity:0} }
+
+/* Последователи у подножия храма */
+#crowd { position:absolute; left:0; right:0; bottom:calc(var(--strip) - 2px); height:26px; z-index:3; pointer-events:none; }
+.fig { position:absolute; bottom:0; left:0; font-size:19px; line-height:1; animation:walk linear infinite alternate; }
+.fig .who { display:inline-block; animation:bob .45s ease-in-out infinite alternate; }
+.fig .carry { position:absolute; font-size:12px; left:-7px; top:3px; }
+@keyframes walk {
+  0%    { transform:translateX(var(--a)) scaleX(-1); }
+  49.9% { transform:translateX(var(--b)) scaleX(-1); }
+  50%   { transform:translateX(var(--b)) scaleX(1); }
+  100%  { transform:translateX(var(--a)) scaleX(1); }
+}
+@keyframes bob { from{transform:translateY(0)} to{transform:translateY(-2px)} }
+
+/* Искры */
+.spark {
+  position:absolute; left:0; top:0; width:6px; height:6px; border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, #fffbe0 0%, #ffd34d 55%, rgba(255,180,40,0) 100%);
+  animation:spark var(--t, .6s) ease-out forwards;
+}
+@keyframes spark {
+  from { transform:translate(var(--x), var(--y)) scale(1); opacity:1; }
+  to   { transform:translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(.3); opacity:0; }
+}
+.tl.glow { opacity:0; }
+.tl.glow.on { opacity:1; }
+
+.flowers { position:absolute; bottom:calc(var(--strip) + 1px); font-size:20px; z-index:3; pointer-events:none; letter-spacing:-3px; }
+.flowers.l { left:6px; }
+.flowers.r { right:6px; }
+
+#toasts {
+  position:absolute; left:10px; right:10px; top:8px; z-index:6;
+  display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;
+}
+.toast {
+  background:rgba(10,28,16,.9); border:1px solid var(--dgold); border-radius:14px;
+  padding:3px 12px; font-size:14px; line-height:1.25; color:var(--ink); text-align:center; max-width:100%;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+  animation:tin .3s ease-out;
+}
+.toast.out { opacity:0; transform:translateY(-8px); transition:all .4s; }
+@keyframes tin { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
+
+/* ══ Постройка эпохи — полоса на земле внизу сцены ══ */
+#build {
+  position:absolute; left:0; right:0; bottom:0; height:var(--strip); z-index:4;
+  padding:3px 12px 0; background:linear-gradient(180deg, rgba(8,22,12,.72), rgba(8,22,12,.92));
+}
+.build-top { display:flex; align-items:baseline; gap:8px; font-size:14px; line-height:1.15; }
+#bname { font-family:'Kurale', serif; color:var(--lgold); font-size:15px; }
+#bstage { color:var(--dim); font-style:italic; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#bpct { font-family:'Kurale', serif; color:var(--gold); }
+.bar { height:5px; border-radius:4px; background:#06110a; overflow:hidden; margin-top:3px; }
+#bfill { height:100%; width:0; border-radius:4px; background:linear-gradient(90deg, var(--dgold), var(--gold), #fff0a0); transition:width .6s; }
+
+/* ══ Комплимент — надпись в небе ══ */
+#ribbon {
+  position:absolute; left:12px; right:12px; top:6px; z-index:4; pointer-events:none;
+  text-align:center; transition:opacity .4s;
+}
+#scene:has(.toast) #ribbon { opacity:0; }   /* всплывашка на месте комплимента — комплимент ждёт */
+#rtext {
+  font-style:italic; font-weight:700; font-size:16px; line-height:1.22; color:#fffaf0;
+  text-shadow:0 1px 3px rgba(10,32,14,.9), 0 0 14px rgba(10,32,14,.55);
+}
+#rtext { transition:opacity .8s ease, transform .8s ease; }
+#rtext.out { opacity:0; transform:translateY(4px); }
+@keyframes rin { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+
+/* ══ Панели ══ */
+#panels { flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px 12px 12px; overscroll-behavior:contain; }
+#panels::-webkit-scrollbar { width:3px; }
+#panels::-webkit-scrollbar-thumb { background:var(--line); }
+.panel { display:none; }
+.panel.on { display:block; }
+
+.mode { display:flex; align-items:center; gap:6px; margin:4px 0 8px; color:var(--dim); font-size:15px; }
+.mode button {
+  padding:3px 12px; border-radius:12px; border:1px solid var(--line); font-family:'Kurale', serif; font-size:15px; color:var(--dim);
+}
+.mode button.on { background:var(--card2); border-color:var(--dgold); color:var(--lgold); }
+
+.row {
+  display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:8px 8px 8px 10px; margin-bottom:7px;
+}
+.row .ic { font-size:28px; width:36px; text-align:center; flex:0 0 auto; }
+.row .info { flex:1; min-width:0; }
+.row .nm { font-family:'Kurale', serif; font-size:18px; color:var(--sand); line-height:1.15; }
+.row .cnt { color:var(--lgold); margin-left:4px; }
+.row .sub { font-size:14px; color:var(--dim); line-height:1.2; font-style:italic; }
+.row .sub2 { font-size:14px; color:#c9dba0; line-height:1.25; }
+.row .sub2 .ms { color:var(--rose); }
+.row.mystery { opacity:.6; border-style:dashed; }
+.row.mystery .nm { letter-spacing:3px; }
+
+.buy {
+  flex:0 0 auto; min-width:86px; padding:6px 8px; border-radius:10px;
+  background:linear-gradient(180deg, #2c4a22, #182c13); border:1px solid var(--gold);
+  display:flex; flex-direction:column; align-items:center; line-height:1.1;
+  transition:transform .08s;
+}
+.buy:active { transform:scale(.95); }
+.buy .bq { font-size:13px; color:var(--sand); }
+.buy .bc { font-family:'Kurale', serif; font-size:16px; color:var(--lgold); white-space:nowrap; }
+.buy.no { background:#0e1a10; border-color:var(--line); }
+.buy.no .bc { color:#6f8a62; }
+.buy.no .bq { color:#62795a; }
+
+.empty { text-align:center; color:var(--dim); font-style:italic; font-size:16px; padding:24px 10px; line-height:1.4; }
+.note { text-align:center; color:var(--dim); font-size:14px; padding:6px; }
+
+.sect { font-family:'Kurale', serif; font-size:16px; color:var(--gold); letter-spacing:1px; margin:10px 2px 6px; }
+.stat { display:flex; justify-content:space-between; font-size:16px; padding:5px 4px; border-bottom:1px solid #1f3524; }
+.stat span:last-child { font-family:'Kurale', serif; color:var(--lgold); }
+.setting { display:flex; align-items:center; justify-content:space-between; font-size:16px; padding:8px 4px; border-bottom:1px solid #1f3524; }
+.switch { width:48px; height:28px; border-radius:14px; background:#24402a; position:relative; transition:background .2s; }
+.switch::after { content:''; position:absolute; left:3px; top:3px; width:22px; height:22px; border-radius:50%; background:#c8b089; transition:transform .2s; }
+.switch.on { background:var(--dgold); }
+.switch.on::after { transform:translateX(20px); background:var(--lgold); }
+.btn-danger { margin:18px auto 6px; display:block; padding:8px 18px; border-radius:10px; border:1px solid #6a2b20; color:#e09080; font-size:15px; }
+
+/* ══ Вкладки ══ */
+#tabs {
+  flex:0 0 auto; display:flex; border-top:1px solid var(--line); background:#08120a;
+  padding-bottom:var(--sab);
+}
+#tabs button {
+  flex:1; padding:6px 2px 7px; display:flex; flex-direction:column; align-items:center; gap:1px;
+  color:var(--dim); font-size:13px; position:relative;
+}
+#tabs button .ti { font-size:21px; line-height:1.1; filter:grayscale(.5) opacity(.75); }
+#tabs button.on { color:var(--lgold); }
+#tabs button.on .ti { filter:none; }
+#tabs button.on::before { content:''; position:absolute; top:-1px; left:22%; right:22%; height:2px; background:var(--gold); border-radius:2px; }
+.badge { position:absolute; top:4px; left:calc(50% + 10px); width:9px; height:9px; border-radius:50%; background:var(--rose); box-shadow:0 0 6px var(--rose); display:none; }
+.badge.show { display:block; }
+
+/* ══ Всплывающие цифры ══ */
+#floats { position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
+.fl {
+  position:absolute; left:0; top:0;
+  font-family:'Kurale', serif; font-size:22px; color:#fff6d0; white-space:nowrap;
+  text-shadow:0 1px 2px rgba(110,55,0,.95), 0 0 8px rgba(255,190,40,.8);
+  animation:fl .9s ease-out forwards;
+  will-change:transform, opacity;
+}
+@keyframes fl {
+  from { transform:translate(var(--x), var(--y)) scale(1); opacity:1; }
+  to   { transform:translate(calc(var(--x) + var(--dx)), calc(var(--y) - 85px)) scale(1.15); opacity:0; }
+}
+
+/* ══ Окна ══ */
+#modal {
+  position:fixed; inset:0; z-index:80; background:rgba(2,8,4,.78);
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+#modal.show { display:flex; }
+.mbox {
+  width:100%; max-width:360px; background:linear-gradient(170deg, #183020, #0c1a10);
+  border:1px solid var(--gold); border-radius:16px; padding:20px 18px 16px; text-align:center;
+  box-shadow:0 0 40px rgba(242,182,50,.25);
+  animation:pop .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop { from{transform:scale(.8);opacity:0} to{transform:none;opacity:1} }
+#mtitle { font-family:'Kurale', serif; font-weight:400; font-size:22px; color:var(--lgold); margin-bottom:8px; }
+#mtext { font-size:17px; line-height:1.35; color:var(--ink); margin-bottom:16px; }
+#mbtns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+#mbtns button { padding:8px 16px; border-radius:10px; border:1px solid var(--line); font-size:16px; color:var(--sand); }
+#mbtns button.main { border-color:var(--gold); color:var(--lgold); background:#2a4420; }
+#mbtns button.danger { border-color:#8a3a2a; color:#f0a090; }
+
+#mtext { white-space:pre-line; }
+#buff {
+  position:absolute; left:50%; bottom:calc(var(--strip) + 6px); transform:translateX(-50%); z-index:5; white-space:pre;
+  font-size:14px; color:#ffe6f0; background:rgba(10,30,16,.86); border:1px solid var(--rose); border-radius:12px; padding:2px 10px;
+}
+
+/* Посланники и лепестки */
+.critter {
+  position:absolute; left:100%; z-index:5; font-size:40px; width:64px; height:64px; line-height:64px; text-align:center;
+  border-radius:50%; background:radial-gradient(circle, rgba(255,248,210,.95) 0%, rgba(255,230,140,.6) 40%, rgba(255,220,120,0) 70%);
+  filter:drop-shadow(0 0 8px rgba(255,215,90,.95));
+  animation:fly linear forwards; touch-action:none;
+}
+.critter.deer { filter:grayscale(1) brightness(1.9) drop-shadow(0 0 8px rgba(255,250,220,.95)); }
+.critter.fairy { filter:drop-shadow(0 0 10px rgba(200,255,160,.95)); }
+@keyframes fly {
+  0%   { left:100%; transform:translateY(0); }
+  25%  { transform:translateY(-14px); }
+  50%  { transform:translateY(8px); }
+  75%  { transform:translateY(-10px); }
+  100% { left:-70px; transform:translateY(0); }
+}
+.petal { position:absolute; top:-30px; z-index:4; font-size:18px; pointer-events:none; animation:fall linear forwards; opacity:0; }
+@keyframes fall {
+  0%   { transform:translate(0, 0) rotate(0); opacity:0; }
+  10%  { opacity:1; }
+  100% { transform:translate(30px, 360px) rotate(300deg); opacity:.2; }
+}
+
+/* Новый гимн */
+#card {
+  position:fixed; left:0; right:0; bottom:calc(70px + var(--sab)); z-index:70; display:none; justify-content:center; padding:0 22px;
+}
+#card.show { display:flex; }
+.cbox {
+  max-width:360px; width:100%; text-align:center; padding:16px 16px 12px; border-radius:16px;
+  background:linear-gradient(170deg, #f8fcea, #e2efc2); color:#24360f;
+  border:2px solid #d9a63a; box-shadow:0 10px 40px rgba(0,0,0,.5), 0 0 30px rgba(255,200,80,.5);
+  animation:pop .45s cubic-bezier(.34,1.56,.64,1);
+}
+#card.r1 .cbox { border-color:#5aa8e0; box-shadow:0 10px 40px rgba(0,0,0,.5), 0 0 34px rgba(110,180,255,.7); }
+#card.r2 .cbox { border-color:#e0609a; background:linear-gradient(170deg, #fff2f6, #ffd9e6); box-shadow:0 10px 40px rgba(0,0,0,.5), 0 0 44px rgba(255,120,180,.85); }
+#ctag { font-size:14px; letter-spacing:1px; color:#9a6a10; margin-bottom:6px; }
+#card.r1 #ctag { color:#2f78b0; }
+#card.r2 #ctag { color:#c03070; }
+#ctext { font-style:italic; font-weight:700; font-size:20px; line-height:1.3; }
+#chint { font-size:13px; color:#5c7040; margin-top:8px; }
+
+/* Книга гимнов */
+.hymn {
+  background:var(--card); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin-bottom:6px;
+  font-style:italic; font-size:16px; line-height:1.3; color:var(--lgold);
+}
+.hymn.r1 { border-color:#3f7fae; box-shadow:inset 3px 0 0 #5aa8e0; }
+.hymn.r2 { border-color:#c0508a; box-shadow:inset 3px 0 0 #f07ab0; color:#ffd6e8; }
+.hymn.locked { color:#4f6a4a; text-align:center; letter-spacing:4px; font-style:normal; border-style:dashed; }
+
+/* Достижения */
+.ach { display:flex; align-items:center; gap:10px; padding:6px 4px; border-bottom:1px solid #1f3524; opacity:.5; }
+.ach.got { opacity:1; }
+.ach .ai { font-size:22px; width:30px; text-align:center; }
+.ach .at { display:flex; flex-direction:column; line-height:1.2; }
+.ach b { font-family:'Kurale', serif; font-weight:400; font-size:16px; color:var(--sand); }
+.ach i { font-size:14px; color:var(--dim); }
+
+#btn-epoch {
+  position:absolute; left:50%; transform:translateX(-50%); bottom:calc(var(--strip) + 8px); z-index:5; white-space:nowrap;
+  padding:6px 18px; border-radius:12px;
+  border:1px solid var(--gold); background:#2a4420; color:var(--lgold); font-size:16px;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+#win {
+  position:fixed; inset:0; z-index:85; display:none; align-items:center; justify-content:center; padding:16px;
+  background:radial-gradient(ellipse at 50% 30%, #1f4a2a 0%, #0c1f12 60%, #040a05 100%);
+}
+#win.show { display:flex; }
+.wbox { width:100%; max-width:400px; max-height:100%; overflow-y:auto; text-align:center; padding:10px 6px; }
+#win-title { font-family:'Kurale', serif; font-weight:400; font-size:24px; line-height:1.2; color:var(--lgold);
+  text-shadow:0 0 24px rgba(255,190,40,.6); margin-bottom:14px; animation:pop .6s cubic-bezier(.34,1.56,.64,1); }
+#win-text div { font-style:italic; font-size:18px; line-height:1.5; color:var(--ink); opacity:0; animation:rin .8s ease-out forwards; }
+#win-sub { font-size:15px; color:var(--sand); margin:16px 0 18px; line-height:1.35; }
+.wmain { display:block; margin:0 auto 10px; padding:10px 22px; border-radius:12px; border:1px solid var(--gold);
+  background:linear-gradient(180deg, #3a5a28, #2a4420); color:var(--lgold); font-size:18px; }
+.wlater { color:var(--dim); font-size:15px; padding:6px 12px; }
+
+#loading {
+  position:fixed; inset:0; z-index:90; background:var(--bg);
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+  color:var(--dim); font-style:italic; font-size:18px; transition:opacity .5s;
+}
+#loading .ls { width:60px; height:60px; border-radius:50%; background:radial-gradient(circle at 40% 36%, #fffbe8, #f9bd33 60%, #e48c0e); box-shadow:0 0 30px rgba(255,190,40,.6); animation:pulse 1.4s ease-in-out infinite; }
+#loading.out { opacity:0; pointer-events:none; }
+
+/* ══ Лес: задний план с лёгким параллаксом (дальние деревья и ближние стволы качаются по-разному) ══ */
+#scene { --far:#4f8a5e; --near:#1d4a2b; }
+#scene[data-phase=dawn]   { --far:#77809c; --near:#2a3a48; }
+#scene[data-phase=sunset] { --far:#7a5272; --near:#2a2236; }
+#scene[data-phase=night]  { --far:#14293a; --near:#06130e; }
+.forest { position:absolute; left:-4%; width:108%; bottom:0; height:100%; z-index:1; pointer-events:none; overflow:visible; transition:fill 3s; }
+#far  { fill:var(--far);  animation:sway 19s ease-in-out infinite alternate; }
+#near { fill:var(--near); animation:sway2 13s ease-in-out infinite alternate; }
+@keyframes sway  { from{transform:translateX(-1%)} to{transform:translateX(1%)} }
+@keyframes sway2 { from{transform:translateX(1.8%)} to{transform:translateX(-1.8%)} }
+#live { position:absolute; left:0; top:0; width:100%; height:100%; z-index:3; pointer-events:none; }
+.sunknot { position:absolute; inset:20%; width:60%; height:60%; color:rgba(170,90,0,.42); pointer-events:none; animation:spin 90s linear infinite reverse; }
+
+/* ══ Фон от Грока: день и ночь. Рассвет и закат — дневная картинка под цветной дымкой неба.
+   Свои SVG-деревья и облака прячем (на картинке уже есть), картинка медленно «дышит» — лёгкое движение. ══ */
+.bg { position:absolute; inset:-3%; background:center 58% / cover no-repeat; opacity:0; transition:opacity 3s;
+  animation:breathe 40s ease-in-out infinite alternate; }
+.bg-day   { background-image:url(fon_den.jpg); }
+.bg-night { background-image:url(fon_noch.jpg); }
+#scene[data-phase=dawn] .bg-day, #scene[data-phase=day] .bg-day, #scene[data-phase=sunset] .bg-day,
+#scene[data-phase=night] .bg-night { opacity:1; }
+@keyframes breathe { from{transform:scale(1) translateX(-1%)} to{transform:scale(1.05) translateX(1%)} }
+.sky { mix-blend-mode:soft-light; }
+#scene[data-phase=day] .s-day, #scene[data-phase=night] .s-night { opacity:0; }
+#scene[data-phase=dawn] .s-dawn { opacity:.8; }
+#scene[data-phase=sunset] .s-sunset { opacity:.9; }
+#scene[data-phase=night] #stars { opacity:.5; }
+#far, #near, .cloud, .temple .ground { display:none; }
+@media (prefers-reduced-motion: reduce) { #far, #near, .rays, .sunknot, .bg { animation:none; } }
+
+/* ══ Ночью вместо солнца — луна (та же кнопка) ══ */
+#sun, .rays { transition:opacity 2s, filter 2s; }
+.h-moon { display:none; }
+#scene[data-phase=night] .h-sun { display:none; }
+#scene[data-phase=night] .h-moon { display:inline; }
+#scene[data-phase=night] #hint { color:#4a5880; }
+#scene[data-phase=night] #sun {
+  background:radial-gradient(circle at 40% 36%, #ffffff 0%, #f1f4ff 30%, #d3dbef 70%, #aab6d4 100%);
+  box-shadow:0 0 24px 6px rgba(210,222,255,.5), 0 0 70px 24px rgba(160,185,255,.2), inset -7px -6px 14px rgba(80,95,150,.35);
+}
+#scene[data-phase=night] #sun::after {
+  inset:0; border:none;
+  background:
+    radial-gradient(circle at 62% 34%, rgba(130,145,190,.45) 0 9%, transparent 10%),
+    radial-gradient(circle at 34% 62%, rgba(130,145,190,.35) 0 12%, transparent 13%),
+    radial-gradient(circle at 66% 70%, rgba(130,145,190,.3) 0 6%, transparent 7%);
+}
+#scene[data-phase=night] .rays { opacity:.45; filter:grayscale(1) brightness(1.3); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="trisk" viewBox="-12 -12 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+    <path id="trisk-arm" d="M0 0 C1 -4 6 -6.5 8.6 -3.2 C11 0 8.6 5 5 4.6 C2.4 4.2 2.6 1 4.6 0.9"/>
+    <use href="#trisk-arm" transform="rotate(120)"/><use href="#trisk-arm" transform="rotate(240)"/>
+  </g></symbol>
+</defs></svg>
+
+<div id="app">
+  <header id="top">
+    <div class="gold-line"><span class="coin"></span><span id="gold">0</span></div>
+    <div class="sub-line">
+      <span>☀️ <b id="rate">0</b> в секунду</span><span>·</span><span>👆 <b id="tapv">1</b> за нажатие</span>
+    </div>
+  </header>
+
+  <section id="scene" data-phase="day">
+    <div class="bg bg-day"></div><div class="bg bg-night"></div>
+    <div class="sky s-dawn"></div><div class="sky s-day"></div><div class="sky s-sunset"></div><div class="sky s-night"></div>
+    <div id="stars"></div>
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <svg class="forest" id="far" viewBox="0 0 240 160" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g opacity=".55"><circle cx="-10" cy="107" r="11"/><circle cx="0" cy="102" r="13"/><path d="M5 116 L13 84 L22 116Z"/><circle cx="24" cy="101" r="16"/><circle cx="35" cy="103" r="17"/><circle cx="48" cy="108" r="10"/><path d="M50 116 L59 88 L69 116Z"/><path d="M64 116 L74 82 L85 116Z"/><circle cx="87" cy="104" r="10"/><circle cx="98" cy="104" r="13"/><circle cx="111" cy="107" r="12"/><path d="M115 116 L126 82 L136 116Z"/><circle cx="141" cy="108" r="12"/><circle cx="152" cy="101" r="15"/><path d="M153 116 L164 81 L176 116Z"/><circle cx="178" cy="106" r="12"/><circle cx="191" cy="107" r="13"/><circle cx="207" cy="101" r="15"/><circle cx="221" cy="105" r="17"/><circle cx="233" cy="101" r="15"/><path d="M238 116 L246 88 L254 116Z"/></g><path d="M-20 128 L-10 99 L-0 128Z"/><path d="M-5 128 L5 96 L15 128Z"/><circle cx="21" cy="115" r="14"/><circle cx="33" cy="119" r="14"/><path d="M35 128 L44 99 L53 128Z"/><circle cx="57" cy="115" r="11"/><circle cx="69" cy="120" r="12"/><circle cx="83" cy="118" r="13"/><circle cx="94" cy="119" r="14"/><circle cx="109" cy="115" r="11"/><path d="M114 128 L122 101 L131 128Z"/><circle cx="133" cy="116" r="9"/><path d="M136 128 L144 97 L152 128Z"/><circle cx="160" cy="117" r="10"/><circle cx="172" cy="121" r="10"/><circle cx="188" cy="115" r="12"/><circle cx="198" cy="120" r="11"/><path d="M199 128 L209 89 L219 128Z"/><circle cx="220" cy="119" r="9"/><circle cx="236" cy="115" r="13"/><path d="M238 128 L248 91 L258 128Z"/><rect x="-10" y="122" width="260" height="40"/><path d="M-10 138 Q120 131 250 138 V160 H-10Z" style="fill:var(--ground)"/></svg>
+    <svg class="forest" id="near" viewBox="0 0 240 160" preserveAspectRatio="none" aria-hidden="true"><g><path d="M-8 160 L-8 0 L9 0 Q7 70 14 160Z"/><path d="M8 46 Q24 38 40 26" fill="none" stroke-width="3.5" style="stroke:var(--near)"/><circle cx="2" cy="4" r="24"/><circle cx="28" cy="0" r="17"/><circle cx="46" cy="-6" r="13"/><circle cx="12" cy="26" r="13"/><circle cx="40" cy="24" r="6"/><circle cx="54" cy="8" r="6"/></g><g transform="translate(240 0) scale(-1 1)"><path d="M-8 160 L-8 0 L9 0 Q7 70 14 160Z"/><path d="M8 46 Q24 38 40 26" fill="none" stroke-width="3.5" style="stroke:var(--near)"/><circle cx="2" cy="4" r="24"/><circle cx="28" cy="0" r="17"/><circle cx="46" cy="-6" r="13"/><circle cx="12" cy="26" r="13"/><circle cx="40" cy="24" r="6"/><circle cx="54" cy="8" r="6"/></g></svg>
+
+    <div id="sunwrap"><div class="rays"></div><div id="sun" role="button" aria-label="Солнце"></div><div id="hint">коснись<br><span class="h-sun">солнца</span><span class="h-moon">луны</span></div></div>
+
+    <svg class="temple" viewBox="0 0 240 120" aria-hidden="true">
+      <defs>
+        <radialGradient id="tglow"><stop offset="0" stop-color="#fff0b0" stop-opacity=".85"/><stop offset="1" stop-color="#fff0b0" stop-opacity="0"/></radialGradient>
+      </defs>
+      <ellipse class="tl glow" data-p="1" cx="120" cy="72" rx="125" ry="58" fill="url(#tglow)"/>
+      <path class="ground" d="M-20 113 Q120 99 260 113 L260 130 L-20 130Z" fill="var(--ground)"/>
+      <!-- Каменный круг -->
+      <g class="ep" id="ep0">
+        <g class="tl" data-p=".03"><ellipse cx="120" cy="106" rx="104" ry="7" fill="#86b862"/></g>
+        <g class="tl" data-p=".12"><ellipse cx="120" cy="103" rx="94" ry="5" fill="none" stroke="#e4dcc0" stroke-width="1.6" stroke-dasharray="4 5"/></g>
+        <g class="tl" data-p=".42" fill="#8e9186"><rect x="84" y="76" width="10" height="29" rx="3"/><rect x="146" y="76" width="10" height="29" rx="3"/><rect x="12" y="80" width="11" height="25" rx="3"/><rect x="217" y="80" width="11" height="25" rx="3"/></g>
+        <g class="tl" data-p=".22" fill="#a9ab9e">
+          <rect x="34" y="66" width="14" height="40" rx="3"/><rect x="62" y="66" width="14" height="40" rx="3"/>
+          <rect x="164" y="66" width="14" height="40" rx="3"/><rect x="192" y="66" width="14" height="40" rx="3"/>
+        </g>
+        <g class="tl" data-p=".32" fill="#b7b8aa"><rect x="98" y="54" width="15" height="52" rx="3"/><rect x="127" y="54" width="15" height="52" rx="3"/></g>
+        <g class="tl" data-p=".52" fill="#9fa194"><rect x="31" y="59" width="48" height="8" rx="2"/><rect x="161" y="59" width="48" height="8" rx="2"/><rect x="94" y="46" width="52" height="9" rx="2"/></g>
+        <g class="tl" data-p=".62"><rect x="106" y="96" width="28" height="9" rx="2" fill="#cdc9b6"/></g>
+        <g class="tl" data-p=".74" color="#f2b632"><use href="#trisk" x="99" y="66" width="13" height="13"/><use href="#trisk" x="128" y="66" width="13" height="13"/><use href="#trisk" x="35" y="78" width="12" height="12"/><use href="#trisk" x="193" y="78" width="12" height="12"/></g>
+        <g class="tl" data-p=".84"><g fill="#ff9cc0"><circle cx="28" cy="104" r="2.2"/><circle cx="88" cy="106" r="2"/><circle cx="160" cy="105" r="2.2"/><circle cx="214" cy="104" r="2"/></g><g fill="#ffe27a"><circle cx="55" cy="105" r="2"/><circle cx="150" cy="107" r="1.8"/><circle cx="185" cy="105" r="2"/></g><g fill="#fff"><circle cx="72" cy="106" r="1.8"/><circle cx="200" cy="106" r="1.8"/><circle cx="18" cy="106" r="1.6"/></g></g>
+        <g class="tl" data-p=".93" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M33 67 Q55 80 77 67" stroke="#f6a5c0"/><path d="M163 67 Q185 80 207 67" stroke="#f6a5c0"/><path d="M96 55 Q120 70 144 55" stroke="#ffe27a"/></g>
+        <g class="tl" data-p="1"><ellipse cx="120" cy="88" rx="16" ry="12" fill="#ffb347" opacity=".35"/><path d="M112 96 Q109 86 116 78 Q116 85 120 84 Q119 76 124 70 Q126 80 129 84 Q131 90 128 96Z" fill="#ff8a2a"/><path d="M116 96 Q115 89 120 84 Q121 89 124 90 Q125 93 124 96Z" fill="#ffe27a"/></g>
+      </g>
+
+      <!-- Священная роща -->
+      <g class="ep" id="ep1">
+        <g class="tl" data-p=".03"><ellipse cx="120" cy="106" rx="108" ry="8" fill="#8cc46a"/></g>
+        <g class="tl" data-p=".12" fill="#8a5a2b"><ellipse cx="40" cy="103" rx="2" ry="2.6"/><ellipse cx="80" cy="103" rx="2" ry="2.6"/><ellipse cx="120" cy="102" rx="2.2" ry="2.8"/><ellipse cx="160" cy="103" rx="2" ry="2.6"/><ellipse cx="200" cy="103" rx="2" ry="2.6"/></g>
+        <g class="tl" data-p=".22" stroke="#4fa35a" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M37 98 L40 103 L43 98"/><path d="M77 98 L80 103 L83 98"/><path d="M157 98 L160 103 L163 98"/><path d="M197 98 L200 103 L203 98"/></g>
+        <g class="tl" data-p=".42"><path d="M5 112 Q60 100 120 106 T236 109" stroke="#b9de8a" stroke-width="3" fill="none" opacity=".85"/></g>
+        <g class="tl" data-p=".32"><g fill="#8a5a2b"><rect x="38.5" y="80" width="3" height="24"/><rect x="78.5" y="76" width="3" height="28"/><rect x="158.5" y="76" width="3" height="28"/><rect x="198.5" y="80" width="3" height="24"/></g><g fill="#6cb862"><circle cx="40" cy="78" r="8"/><circle cx="80" cy="73" r="9"/><circle cx="160" cy="73" r="9"/><circle cx="200" cy="78" r="8"/></g></g>
+        <g class="tl" data-p=".52"><path d="M115 106 Q117 80 116 52 L124 52 Q123 80 125 106Z" fill="#7a5532"/><g fill="#3f8a4a"><circle cx="40" cy="70" r="13"/><circle cx="80" cy="64" r="14"/><circle cx="160" cy="64" r="14"/><circle cx="200" cy="70" r="13"/><circle cx="104" cy="50" r="16"/><circle cx="136" cy="50" r="16"/><circle cx="120" cy="36" r="22"/></g><g fill="#56a05a"><circle cx="114" cy="30" r="10"/><circle cx="76" cy="58" r="7"/><circle cx="156" cy="58" r="7"/></g></g>
+        <g class="tl" data-p=".62"><g fill="#ff9cc0"><circle cx="30" cy="104" r="2"/><circle cx="96" cy="105" r="2"/><circle cx="178" cy="105" r="2"/></g><g fill="#ffe27a"><circle cx="58" cy="106" r="1.8"/><circle cx="142" cy="106" r="2"/><circle cx="216" cy="104" r="1.8"/></g><g fill="#c9a6ff"><circle cx="66" cy="104" r="1.8"/><circle cx="186" cy="104" r="1.8"/></g></g>
+        <g class="tl" data-p=".74" fill="none" stroke-linecap="round"><path d="M-5 113 Q60 106 120 112 T245 110" stroke="#8fd3e8" stroke-width="3"/><path d="M100 111 Q120 99 140 111" stroke="#8a5a2b" stroke-width="2.4"/><path d="M103 106 Q120 96 137 106" stroke="#a87a4a" stroke-width="1"/></g>
+        <g class="tl" data-p=".84" stroke-width="1.6" stroke-linecap="round"><path d="M72 72 l-2 10" stroke="#f6a5c0"/><path d="M88 70 l1 9" stroke="#7cc4f0"/><path d="M152 70 l-1 9" stroke="#ffe27a"/><path d="M168 72 l2 10" stroke="#f6a5c0"/><path d="M110 56 l-1 9" stroke="#ffe27a"/><path d="M130 56 l1 9" stroke="#7cc4f0"/></g>
+        <g class="tl" data-p=".93" fill="#fff6a0"><circle cx="36" cy="64" r="1.3"/><circle cx="86" cy="56" r="1.3"/><circle cx="100" cy="44" r="1.2"/><circle cx="128" cy="26" r="1.3"/><circle cx="142" cy="46" r="1.2"/><circle cx="166" cy="60" r="1.3"/><circle cx="206" cy="66" r="1.2"/></g>
+        <g class="tl" data-p="1"><g fill="#ffc4dc"><circle cx="112" cy="22" r="2"/><circle cx="126" cy="30" r="2"/><circle cx="134" cy="20" r="1.8"/><circle cx="106" cy="38" r="1.8"/><circle cx="140" cy="40" r="1.8"/></g><path d="M30 26 q5 -5 10 0 q5 -5 10 0 M186 18 q4 -4 8 0 q4 -4 8 0" stroke="#3a4a3a" stroke-width="1.5" fill="none"/></g>
+      </g>
+
+      <!-- Дуб друидов -->
+      <g class="ep" id="ep2">
+        <g class="tl" data-p=".03"><path d="M16 108 Q120 80 224 108Z" fill="#74a956"/></g>
+        <g class="tl" data-p=".12"><ellipse cx="120" cy="92" rx="3" ry="4" fill="#a8743a"/><path d="M116.4 90.5 a3.6 2.6 0 0 1 7.2 0Z" fill="#6b4417"/></g>
+        <g class="tl" data-p=".22"><path d="M120 90 V78" stroke="#5fb36a" stroke-width="2"/><ellipse cx="115" cy="79" rx="5" ry="2.4" fill="#6cc070"/><ellipse cx="125" cy="77" rx="5" ry="2.4" fill="#6cc070"/></g>
+        <g class="tl" data-p=".42" stroke="#6b4a2a" stroke-width="5" fill="none" stroke-linecap="round"><path d="M113 52 Q92 42 70 46"/><path d="M127 52 Q150 40 172 44"/><path d="M118 48 Q115 32 106 22"/><path d="M123 48 Q130 32 140 22"/></g>
+        <g class="tl" data-p=".32"><path d="M107 98 Q112 72 110 46 L130 46 Q128 72 133 98Z" fill="#7a5532"/><path d="M116 92 Q118 76 115 60 M124 90 Q123 74 126 58" stroke="#5e3f22" stroke-width="1.2" fill="none"/></g>
+        <g class="tl" data-p=".52"><g fill="#3d7f45"><circle cx="120" cy="30" r="26"/><circle cx="92" cy="40" r="20"/><circle cx="148" cy="40" r="20"/><circle cx="72" cy="50" r="13"/><circle cx="168" cy="50" r="13"/><circle cx="120" cy="12" r="15"/></g><g fill="#4f9a52"><circle cx="110" cy="22" r="11"/><circle cx="86" cy="36" r="8"/><circle cx="150" cy="32" r="9"/></g></g>
+        <g class="tl" data-p=".62" stroke="#6b4a2a" stroke-width="3.5" fill="none" stroke-linecap="round"><path d="M108 96 Q96 99 84 104"/><path d="M132 96 Q144 99 156 104"/><path d="M111 97 Q104 103 98 108"/><path d="M129 97 Q136 103 142 108"/></g>
+        <g class="tl" data-p=".74"><path d="M113 96 V84 a7 7 0 0 1 14 0 V96Z" fill="#3b2614"/><circle cx="124" cy="90" r="1.1" fill="#f2b632"/><use href="#trisk" x="115" y="64" width="10" height="10" color="#f2b632"/></g>
+        <g class="tl" data-p=".84"><g fill="#c4e88a"><circle cx="84" cy="48" r="4"/><circle cx="156" cy="46" r="4"/><circle cx="118" cy="20" r="4"/></g><g fill="#fff"><circle cx="83" cy="47" r="1"/><circle cx="86" cy="49" r="1"/><circle cx="155" cy="45" r="1"/><circle cx="158" cy="47" r="1"/><circle cx="117" cy="19" r="1"/><circle cx="120" cy="21" r="1"/></g></g>
+        <g class="tl" data-p=".93"><g stroke="#4a3420" stroke-width=".8"><line x1="78" y1="50" x2="78" y2="58"/><line x1="100" y1="54" x2="100" y2="62"/><line x1="140" y1="54" x2="140" y2="62"/><line x1="162" y1="50" x2="162" y2="58"/></g><g fill="#ffd86a"><circle cx="78" cy="60" r="2.4"/><circle cx="100" cy="64" r="2.4"/><circle cx="140" cy="64" r="2.4"/><circle cx="162" cy="60" r="2.4"/></g></g>
+        <g class="tl" data-p="1" fill="#f2c94c"><circle cx="100" cy="24" r="1.8"/><circle cx="132" cy="16" r="1.8"/><circle cx="144" cy="30" r="1.8"/><circle cx="80" cy="42" r="1.6"/><circle cx="164" cy="44" r="1.6"/><circle cx="112" cy="40" r="1.6"/><circle cx="128" cy="38" r="1.6"/><circle cx="120" cy="4" r="1.6"/><circle cx="96" cy="50" r="1.4"/><circle cx="152" cy="52" r="1.4"/></g>
+      </g>
+
+      <!-- Холм фей -->
+      <g class="ep" id="ep3">
+        <g class="tl" data-p="1" fill="none" stroke-width="3" opacity=".6"><path d="M30 104 A90 76 0 0 1 210 104" stroke="#ff8a8a"/><path d="M34 104 A86 72 0 0 1 206 104" stroke="#ffd86a"/><path d="M38 104 A82 68 0 0 1 202 104" stroke="#8fe08a"/><path d="M42 104 A78 64 0 0 1 198 104" stroke="#7cc4f0"/></g>
+        <g class="tl" data-p=".03"><path d="M26 108 Q44 58 120 54 Q196 58 214 108Z" fill="#6aa04e"/><path d="M60 70 Q90 58 120 57" stroke="#86bf62" stroke-width="3" fill="none" opacity=".7"/></g>
+        <g class="tl" data-p=".12"><g fill="#f4ecd8"><rect x="21" y="100" width="3" height="6"/><rect x="35" y="102" width="3" height="6"/><rect x="202" y="102" width="3" height="6"/><rect x="216" y="100" width="3" height="6"/></g><g fill="#e0483a"><path d="M17 101 a5.5 4.5 0 0 1 11 0Z"/><path d="M31 103 a5.5 4.5 0 0 1 11 0Z"/><path d="M198 103 a5.5 4.5 0 0 1 11 0Z"/><path d="M212 101 a5.5 4.5 0 0 1 11 0Z"/></g><g fill="#fff"><circle cx="21" cy="99" r=".9"/><circle cx="25" cy="98.5" r=".8"/><circle cx="35" cy="101" r=".9"/><circle cx="39" cy="100.5" r=".8"/><circle cx="202" cy="101" r=".9"/><circle cx="206" cy="100.5" r=".8"/><circle cx="216" cy="99" r=".9"/><circle cx="220" cy="98.5" r=".8"/></g></g>
+        <g class="tl" data-p=".22"><path d="M107 106 V92 a13 13 0 0 1 26 0 V106Z" fill="#8a5a2b"/><path d="M110 106 V92 a10 10 0 0 1 20 0 V106Z" fill="#3f7fae"/><circle cx="120" cy="96" r="1.6" fill="#f2b632"/></g>
+        <g class="tl" data-p=".32"><g fill="#ffd86a" stroke="#8a5a2b" stroke-width="1.5"><circle cx="84" cy="84" r="6"/><circle cx="156" cy="84" r="6"/></g><g stroke="#8a5a2b" stroke-width="1"><line x1="78" y1="84" x2="90" y2="84"/><line x1="84" y1="78" x2="84" y2="90"/><line x1="150" y1="84" x2="162" y2="84"/><line x1="156" y1="78" x2="156" y2="90"/></g></g>
+        <g class="tl" data-p=".42"><g fill="#ff9cc0"><circle cx="58" cy="80" r="2"/><circle cx="104" cy="66" r="2"/><circle cx="178" cy="78" r="2"/></g><g fill="#ffe27a"><circle cx="70" cy="70" r="1.8"/><circle cx="140" cy="64" r="1.8"/><circle cx="190" cy="92" r="1.8"/></g><g fill="#fff"><circle cx="48" cy="94" r="1.6"/><circle cx="124" cy="62" r="1.6"/><circle cx="168" cy="70" r="1.6"/></g></g>
+        <g class="tl" data-p=".52" fill="#d4cfbe"><ellipse cx="120" cy="108" rx="5" ry="1.6"/><ellipse cx="117" cy="111.5" rx="6" ry="1.9"/><ellipse cx="121" cy="115.5" rx="7" ry="2.2"/></g>
+        <g class="tl" data-p=".62"><g stroke="#5a4030" stroke-width="1.2"><line x1="66" y1="106" x2="66" y2="90"/><line x1="174" y1="106" x2="174" y2="90"/></g><g fill="#fff3a0"><circle cx="66" cy="88" r="2.6"/><circle cx="174" cy="88" r="2.6"/></g><g fill="#fff3a0" opacity=".3"><circle cx="66" cy="88" r="6"/><circle cx="174" cy="88" r="6"/></g></g>
+        <g class="tl" data-p=".74" fill="none" stroke-linecap="round"><path d="M-5 116 Q60 109 120 114 T245 113" stroke="#8fd3e8" stroke-width="3"/><path d="M104 115 Q120 105 136 115" stroke="#8a5a2b" stroke-width="2.4"/></g>
+        <g class="tl" data-p=".84" fill="#7d9cf0"><path d="M50 88 q2 -5 4 0z M96 62 q2 -5 4 0z M150 62 q2 -5 4 0z M188 86 q2 -5 4 0z M130 58 q2 -5 4 0z"/></g>
+        <g class="tl" data-p=".93" fill="#fff6a0"><circle cx="60" cy="50" r="1.4"/><circle cx="82" cy="40" r="1.2"/><circle cx="104" cy="46" r="1.3"/><circle cx="138" cy="40" r="1.3"/><circle cx="160" cy="48" r="1.2"/><circle cx="182" cy="56" r="1.4"/></g>
+      </g>
+
+      <!-- Чертог под звёздами -->
+      <g class="ep" id="ep4">
+        <g class="tl" data-p=".93" fill="none" stroke-width="5" stroke-linecap="round" opacity=".45"><path d="M10 22 Q60 6 110 20 T230 14" stroke="#7af0b0"/><path d="M20 34 Q80 20 130 32 T236 26" stroke="#c08aff"/></g>
+        <g class="tl" data-p=".03"><ellipse cx="120" cy="107" rx="106" ry="7" fill="#3d6a52"/></g>
+        <g class="tl" data-p=".12"><path d="M108 122 L117 100 L123 100 L132 122Z" fill="#e4ecff" opacity=".45"/></g>
+        <g class="tl" data-p=".22"><rect x="50" y="97" width="140" height="7" rx="2" fill="#cfd6e0"/></g>
+        <g class="tl" data-p=".52"><path d="M52 54 Q120 4 188 54Z" fill="#1d2a63"/><g fill="#fff"><circle cx="96" cy="38" r=".9"/><circle cx="110" cy="28" r="1"/><circle cx="126" cy="24" r=".9"/><circle cx="140" cy="32" r="1"/><circle cx="156" cy="42" r=".9"/><circle cx="120" cy="40" r=".8"/><circle cx="80" cy="48" r=".8"/><circle cx="168" cy="48" r=".8"/></g></g>
+        <g class="tl" data-p=".32"><g fill="#f4f6f0"><rect x="57" y="52" width="6" height="45"/><rect x="81" y="52" width="6" height="45"/><rect x="105" y="52" width="6" height="45"/><rect x="129" y="52" width="6" height="45"/><rect x="153" y="52" width="6" height="45"/><rect x="177" y="52" width="6" height="45"/></g><g fill="#2a2a2a"><rect x="57" y="62" width="3" height="1.4"/><rect x="60" y="78" width="3" height="1.4"/><rect x="81" y="70" width="3" height="1.4"/><rect x="84" y="86" width="3" height="1.4"/><rect x="105" y="60" width="3" height="1.4"/><rect x="108" y="82" width="3" height="1.4"/><rect x="132" y="66" width="3" height="1.4"/><rect x="129" y="88" width="3" height="1.4"/><rect x="153" y="74" width="3" height="1.4"/><rect x="156" y="58" width="3" height="1.4"/><rect x="180" y="68" width="3" height="1.4"/><rect x="177" y="84" width="3" height="1.4"/></g></g>
+        <g class="tl" data-p=".42" fill="none" stroke="#e8eef6" stroke-width="2.4"><path d="M60 54 Q72 40 84 54"/><path d="M84 54 Q96 40 108 54"/><path d="M108 54 Q120 40 132 54"/><path d="M132 54 Q144 40 156 54"/><path d="M156 54 Q168 40 180 54"/></g>
+        <g class="tl" data-p=".62" fill="#bfe6ff" opacity=".8"><circle cx="72" cy="72" r="4"/><circle cx="96" cy="72" r="4"/><circle cx="144" cy="72" r="4"/><circle cx="168" cy="72" r="4"/><path d="M114 97 V80 a6 6 0 0 1 12 0 V97Z"/></g>
+        <g class="tl" data-p=".74"><g stroke="#cfd6e0" stroke-width=".7"><line x1="72" y1="49" x2="72" y2="56"/><line x1="96" y1="49" x2="96" y2="56"/><line x1="144" y1="49" x2="144" y2="56"/><line x1="168" y1="49" x2="168" y2="56"/></g><g fill="#ffe27a"><circle cx="72" cy="58" r="2.2"/><circle cx="96" cy="58" r="2.2"/><circle cx="144" cy="58" r="2.2"/><circle cx="168" cy="58" r="2.2"/></g></g>
+        <g class="tl" data-p=".84"><g stroke="#9aa6bb" stroke-width="1.2"><line x1="36" y1="104" x2="36" y2="50"/><line x1="204" y1="104" x2="204" y2="50"/></g><polygon points="36,50 52,54 36,60" fill="#2a3a8a"/><polygon points="204,50 220,54 204,60" fill="#2a3a8a"/><g fill="#fff"><circle cx="40" cy="54" r=".8"/><circle cx="44" cy="56" r=".8"/><circle cx="208" cy="53" r=".8"/><circle cx="212" cy="55" r=".8"/></g></g>
+        <g class="tl" data-p="1"><polygon points="120,0 123,8 131,8 125,13 127,21 120,16 113,21 115,13 109,8 117,8" fill="#f2c94c"/></g>
+      </g>
+    </svg>
+    <canvas id="live" aria-hidden="true"></canvas>
+
+    <div id="crowd"></div>
+    <div id="flash"></div>
+    <div class="flowers l">🌼🍄</div><div class="flowers r">🌿🌸</div>
+    <div id="ribbon"><span id="rtext"></span></div>
+    <div id="build">
+      <div class="build-top"><span id="bname">Каменный круг</span><span id="bstage"></span><span id="bpct">0%</span></div>
+      <div class="bar"><div id="bfill"></div></div>
+    </div>
+    <button id="btn-epoch" style="display:none">✨ Начать новую эпоху</button>
+    <div id="toasts"></div>
+    <div id="buff" style="display:none"></div>
+  </section>
+
+  <main id="panels">
+    <section class="panel on" id="p-fol">
+      <div class="mode">Нанимать:
+        <button data-m="1">×1</button><button data-m="10">×10</button><button data-m="0">Макс</button>
+      </div>
+      <div id="fol-list"></div>
+    </section>
+
+    <section class="panel" id="p-gift">
+      <div id="gift-list"></div>
+      <div id="gift-empty" class="empty">Новые дары появятся, когда казна наполнится ✨</div>
+      <div id="gift-done" class="note"></div>
+    </section>
+
+    <section class="panel" id="p-book">
+      <div class="sect" id="book-count"></div>
+      <div class="note">Песни выпадают за нажатия, посланников, ежедневный дар и новых последователей</div>
+      <div id="book-list"></div>
+    </section>
+
+    <section class="panel" id="p-temple">
+      <div class="sect">Летопись</div>
+      <div class="stat"><span>Эпоха</span><span id="st-ep">1</span></div>
+      <div class="stat"><span>Благодать (ко всему доходу)</span><span id="st-gr">пока нет</span></div>
+      <div class="stat"><span>Нажатий на солнце</span><span id="st-c">0</span></div>
+      <div class="stat"><span>Золота за всё время</span><span id="st-gt">0</span></div>
+      <div class="stat"><span>Последователей</span><span id="st-f">0</span></div>
+      <div class="stat"><span>Даров получено</span><span id="st-u">0</span></div>
+      <div class="sect" id="ach-head">Достижения</div>
+      <div id="ach-list"></div>
+      <div class="sect">Настройки</div>
+      <div class="setting"><span>Вибрация</span><button class="switch" id="sw-vib" aria-label="Вибрация"></button></div>
+      <button class="btn-danger" id="btn-reset">Сбросить всё</button>
+    </section>
+  </main>
+
+  <nav id="tabs">
+    <button data-tab="p-fol" class="on"><span class="ti">👥</span>Последователи</button>
+    <button data-tab="p-gift"><span class="ti">🎁</span>Дары<span class="badge" id="gift-badge"></span></button>
+    <button data-tab="p-book"><span class="ti">📖</span>Книга песен</button>
+    <button data-tab="p-temple"><span class="ti">🌳</span>Роща</button>
+  </nav>
+</div>
+
+<div id="win">
+  <div class="wbox">
+    <h2 id="win-title"></h2>
+    <div id="win-text"></div>
+    <div id="win-sub"></div>
+    <button class="wmain" id="win-go">Начать новую эпоху</button>
+    <button class="wlater" id="win-later">Ещё полюбоваться</button>
+  </div>
+</div>
+<div id="card"><div class="cbox"><div id="ctag"></div><div id="ctext"></div><div id="chint"></div></div></div>
+<div id="floats"></div>
+<div id="modal"><div class="mbox"><h3 id="mtitle"></h3><div id="mtext"></div><div id="mbtns"></div></div></div>
+<div id="loading"><div class="ls"></div>Друиды зажигают огни…</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════
+// ДАННЫЕ
+// ══════════════════════════════════════════════
+
+// Песни бардов (комплименты) — у второй игры свои, лесные. Книга песен = COMPLIMENTS + HYMNS_EXTRA;
+// собранное хранится по номерам, поэтому НОВОЕ ДОБАВЛЯТЬ ТОЛЬКО В КОНЕЦ HYMNS_EXTRA.
+const COMPLIMENTS = [
+  "Женя, лес становится тише, чтобы послушать твой смех!",
+  "Женя, старые дубы шелестят твоё имя!",
+  "Женя, ты светлее солнечной поляны в июне!",
+  "Женя, даже мох под твоими ногами становится мягче!",
+  "Женя, светлячки зажигаются, когда ты рядом!",
+  "Женя, ты красивее цветущего вереска на холмах!",
+  "Женя, барды до сих пор подбирают рифму к твоей улыбке!",
+  "Женя, утренний туман расступается перед тобой!",
+  "Женя, с тобой любая тропинка ведёт в сказку!",
+  "Женя, ромашки на поляне гадают только на тебя!",
+  "Женя, ты — самый тёплый луч в этой роще!",
+  "Женя, птицы поют громче, когда ты проходишь мимо!",
+  "Женя, ты мудрее любого друида!",
+  "Женя, белый олень выходит из чащи только ради тебя!",
+  "Женя, феи учатся у тебя танцевать!",
+  "Женя, ты прекраснее рассвета над озером!",
+  "Женя — солнце этого леса. Без вариантов.",
+  "Женя, роса на траве блестит от радости, что ты пришла!",
+  "Женя, каменный круг простоял тысячу лет, чтобы дождаться тебя!",
+  "Женя, рядом с тобой даже дождик — грибной и тёплый!",
+  "Женя, твой смех звенит, как лесной ручей!",
+  "Женя, ты добрая, как летний вечер у костра!",
+  "Женя, каждая ромашка мечтает попасть в твой венок!",
+  "Женя, Белтайн празднуют в твою честь!",
+  "Женя, ты — солнце, ради которого распускается лес!",
+  "Женя, даже совы не спят, чтобы полюбоваться тобой!",
+  "Женя, лисы ведут себя прилично, когда ты рядом!",
+  "Женя, ты сильная, как корни старого дуба!",
+  "Женя, ты нежнее лепестков дикой розы!",
+  "Женя, твоё имя стоит вырезать на самом красивом камне!",
+  "Женя, ветер в кронах поёт о тебе!",
+  "Женя, ты — главная легенда этого леса!",
+  "Женя, ты сильнее, чем думаешь, и добрее, чем замечаешь!",
+  "Женя, с тобой и в чаще светло!",
+  "Женя, ты умеешь находить красоту в каждой травинке!",
+  "Женя, клевер растёт четырёхлистным там, где ты прошла!",
+  "Женя, ты украшение любого праздника!",
+  "Женя, солнце на Литу светит дольше, чтобы подольше видеть тебя!",
+  "Женя, ты лучше любой сказки у камина!",
+  "Женя, колокольчики звенят, когда ты улыбаешься!",
+  "Женя, в тебе столько света, что хватит на весь лес!",
+  "Женя, ты храбрее любого рыцаря из баллад!",
+  "Женя, бабочки садятся на тебя, перепутав с цветком!",
+  "Женя, ты — самая яркая звёздочка над рощей!",
+  "Женя, даже ёжики выходят на тропинку поздороваться!",
+  "Женя, ты умница, и лес это знает!",
+  "Женя, твоя улыбка согревает лучше костра!",
+  "Женя, ты как первый подснежник — приносишь весну!",
+  "Женя, весь лес на твоей стороне!",
+  "Женя, дубы стоят столетиями, чтобы рассказывать о тебе!",
+  "Женя, ты легче пуха одуванчика!",
+  "Женя, у тебя отличный вкус — даже феи советуются с тобой!",
+  "Женя, ты сияешь ярче огней Белтайна!",
+  "Женя, небо над лесом голубее, когда ты смотришь вверх!",
+  "Женя, каждая песня барда немножко о тебе!",
+  "Женя, с тобой хочется гулять по лесу до самого заката!",
+  "Женя, ты — тот самый клад, который ищут под холмами!",
+  "Женя, ты освещаешь любую тропу!",
+  "Женя, твоё сердце тёплое, как нагретый солнцем камень!",
+  "Женя, ты прекрасна в любое время года!",
+  "Женя, осень золотит листья в твою честь!",
+  "Женя, зимой лес ждёт тебя, как ждёт весну!",
+  "Женя, весна приходит туда, где ты!",
+  "Женя, мир становится светлее просто потому, что ты в нём есть!",
+  "Женя, летние ночи короткие, потому что солнце торопится к тебе!",
+  "Женя, ты вдохновляешь даже старых сказителей!",
+  "Женя, ты настоящее чудо этого леса!",
+  "Женя, рядом с тобой всё растёт и цветёт!",
+  "Женя, твоя доброта сильнее любого заклинания!",
+  "Женя, ты как солнечный зайчик в листве — радуешь всех!",
+  "Женя, ты умеешь превращать обычный день в праздник!",
+  "Женя, рябина краснеет, когда ты проходишь мимо!",
+  "Женя, ты свежая, как лес после дождя!",
+  "Женя, ты — лучшее, что случилось с этой рощей!",
+  "Женя, даже камни в круге улыбаются тебе!",
+  "Женя, ты сияешь, как роса на паутинке!",
+  "Женя, твой голос мелодичнее арфы барда!",
+  "Женя, ты всегда знаешь, куда ведёт тропа!",
+  "Женя, ты — самая настоящая магия этого мира!",
+  "Женя, рядом с тобой не страшно и в самой глухой чаще!",
+  "Женя, ты прекраснее всех королев из старых легенд!",
+  "Женя, тебе идёт венок из полевых цветов!",
+  "Женя, ты свободная, как ветер над холмами!",
+  "Женя, ты — целая поляна радости!",
+  "Женя, звёзды над рощей складываются в твоё имя!",
+  "Женя, твоя энергия будит весь лес по утрам!",
+  "Женя, у тебя золотое сердце — золотее мёда!",
+  "Женя, ты как солнце после долгой зимы!",
+  "Женя, в лесу говорят: где Женя — там лето!",
+  "Женя, твоя улыбка заменяет солнце в пасмурный день!",
+  "Женя, ты лучше вереска, мёда и тёплого хлеба вместе взятых!",
+  "Женя, даже серьёзный филин хлопает тебе крыльями!",
+  "Женя, ты удивительная — и это не обсуждается!",
+  "Женя, ручьи бегут быстрее, чтобы рассказать о тебе морю!",
+  "Женя, с тобой всегда тепло, даже в самую длинную ночь!",
+  "Женя, ты как огонёк в окне лесного домика!",
+  "Женя, ты прекрасна, как цветущая яблоня!",
+  "Женя, с тобой интересно даже просто смотреть на облака!",
+  "Женя, твоя забота — как тень дуба в жаркий день!",
+  "Женя, ты умеешь радоваться мелочам, и это редкий дар!",
+  "Женя, твоё настроение заразительнее весеннего солнца!",
+  "Женя, ты — лучшее украшение Литы!",
+  "Женя, корни, листья, звёзды — все за тебя!",
+  "Женя, ты как радуга над мокрым лесом!",
+  "Женя, ты собираешь улыбки, как ягоды в лукошко!",
+  "Женя, лесные тропинки сами сворачивают к тебе!",
+  "Женя, даже дождь в лесу идёт аккуратно, чтобы тебя не намочить!",
+  "Женя, ты прекраснее праздничного костра в ночь на Литу!",
+  "Женя, твоё имя пахнет летом и липовым цветом!",
+  "Женя, все цветы поляны считают тебя своей королевой!",
+  "Женя, дятел стучит в ритм твоего смеха!",
+  "Женя, ты — самый добрый дух этого леса!",
+  "Женя, тебе рады в каждом уголке рощи!",
+  "Женя, солнце пробивается сквозь кроны, чтобы найти тебя!",
+  "Женя, ты лучше любой легенды — потому что ты настоящая!",
+];
+const WIN_TEXTS = [
+  "Женя, ты победила.",
+  "Тысячи рук растили это чудо во имя твоё.",
+  "Барды сложили о тебе сотню песен — и это только начало.",
+  "Шумят дубы, звенят ручьи, светятся огоньки в траве.",
+  "ХРАМ БОГИНИ ЖЕНИ ПОСТРОЕН.",
+  "Пусть каждый камень и каждый лист помнят твоё имя.",
+  "Пусть солнце Белтайна светит тебе всё лето.",
+  "Ты достойна всего этого и много большего.",
+  "Спасибо, что ты есть. 🌿"
+];
+
+// Новые песни добавлять сюда, ТОЛЬКО В КОНЕЦ (иначе у Жени перепутаются собранные карточки).
+const HYMNS_EXTRA = [
+];
+const HYMNS = COMPLIMENTS.concat(HYMNS_EXTRA);
+const LEGENDARY = new Set([
+  "Женя — солнце этого леса. Без вариантов.",
+  "Женя, ты сильнее, чем думаешь, и добрее, чем замечаешь!",
+  "Женя, весь лес на твоей стороне!",
+  "Женя, мир становится светлее просто потому, что ты в нём есть!",
+  "Женя, ты — самая настоящая магия этого мира!",
+  "Женя, с тобой всегда тепло, даже в самую длинную ночь!",
+  "Женя, ты лучше любой легенды — потому что ты настоящая!",
+]);
+// 0 — обычный, 1 — редкий, 2 — легендарный
+const RARITY = HYMNS.map((t, i) => LEGENDARY.has(t) ? 2 : (i % 4 === 3 ? 1 : 0));
+const RARITY_NAME = ['обычная песня', 'редкая песня', 'легендарная песня'];
+const RARITY_WEIGHT = [10, 4, 1];
+
+const FOLLOWERS = [
+  { icon:'🌿', name:'Травницы',          gen:'Травниц',           role:'Собирают травы для рощи',          cost:15,     gps:0.1 },
+  { icon:'🪓', name:'Лесники',           gen:'Лесников',          role:'Берегут деревья Богини',           cost:100,    gps:1 },
+  { icon:'🐝', name:'Пасечники',         gen:'Пасечников',        role:'Приносят мёд и воск',              cost:1100,   gps:8 },
+  { icon:'🧶', name:'Пряхи',             gen:'Прях',              role:'Прядут плащи из лунного света',    cost:12000,  gps:47 },
+  { icon:'🔨', name:'Кузнецы',           gen:'Кузнецов',          role:'Куют узорчатые серпы',             cost:130000, gps:260 },
+  { icon:'🎶', name:'Барды',             gen:'Бардов',            role:'Поют песни о Жене',                cost:1.4e6,  gps:1400 },
+  { icon:'🏹', name:'Стражи леса',       gen:'Стражей леса',      role:'Охраняют тропы рощи',              cost:2e7,    gps:7800 },
+  { icon:'🐎', name:'Всадники',          gen:'Всадников',         role:'Разносят вести по холмам',         cost:3.3e8,  gps:44000 },
+  { icon:'🌙', name:'Провидицы',         gen:'Провидиц',          role:'Читают знаки в звёздах',           cost:5.1e9,  gps:260000 },
+  { icon:'🍃', name:'Друиды',            gen:'Друидов',           role:'Говорят с древними дубами',        cost:7.5e10, gps:1.6e6 },
+  { icon:'🧚', name:'Феи',               gen:'Фей',               role:'Зажигают огоньки в траве',         cost:1e12,   gps:1e7 },
+  { icon:'✨', name:'Верховные друиды',  gen:'Верховных друидов', role:'Хранят тайны священной рощи',      cost:1.4e13, gps:6.5e7 },
+];
+const COST_GROWTH = 1.15;
+const MILESTONES = [10, 25, 50, 100, 200];   // столько штук одного тира → его доход ×2
+
+const TIER_GIFT_NAMES = [
+  ['Плетёные корзины', 'Утренняя роса'],
+  ['Острые топорики', 'Тропы в чаще'],
+  ['Липовый цвет', 'Вересковый мёд'],
+  ['Прялки из ясеня', 'Нити из лунного света'],
+  ['Каменный горн', 'Узорчатые серпы'],
+  ['Арфы из ивы', 'Песни у костра'],
+  ['Луки из тиса', 'Ночные дозоры'],
+  ['Белые кони', 'Зелёные знамёна'],
+  ['Хрустальные чаши', 'Знаки на воде'],
+  ['Омела с дуба', 'Огамические письмена'],
+  ['Венки из клевера', 'Танцы при луне'],
+  ['Тайна старого дуба', 'Священное имя'],
+];
+
+// id даров не менять: по ним хранится, что куплено
+const GIFTS = [
+  { id:1, kind:'tap', icon:'🌼', name:'Венок из ромашек',      desc:'Сила нажатия ×2', cost:100,   req:() => G.c >= 10 },
+  { id:2, kind:'tap', icon:'💍', name:'Серебряные браслеты',   desc:'Сила нажатия ×2', cost:1000,  req:() => G.c >= 100 },
+  { id:3, kind:'tap', icon:'🤲', name:'Благословенные ладони', desc:'Сила нажатия ×2', cost:25000, req:() => G.c >= 300 },
+  { id:4, kind:'pct', icon:'☀️', name:'Колесо Солнца',    desc:'Каждое нажатие приносит ещё 1% дохода в секунду', cost:1e5,  req:() => D.income >= 20 },
+  { id:5, kind:'pct', icon:'🔥', name:'Костёр Белтайна',  desc:'Нажатие: ещё +1% дохода в секунду', cost:1e7,  req:() => D.income >= 2000 },
+  { id:6, kind:'pct', icon:'🍀', name:'Четырёхлистник',   desc:'Нажатие: ещё +1% дохода в секунду', cost:1e9,  req:() => D.income >= 2e5 },
+  { id:7, kind:'pct', icon:'🌙', name:'Серп молодой луны', desc:'Нажатие: ещё +1% дохода в секунду', cost:1e11, req:() => D.income >= 2e7 },
+  { id:8, kind:'pct', icon:'👑', name:'Венец Богини Леса', desc:'Нажатие: ещё +1% дохода в секунду', cost:1e13, req:() => D.income >= 2e9 },
+  { id:20, kind:'all', val:0.2, icon:'🌷', name:'Цветущие поляны',    desc:'Весь доход +20%', cost:2e4,  req:() => D.income > 0 },
+  { id:21, kind:'all', val:0.2, icon:'💧', name:'Священный источник', desc:'Весь доход +20%', cost:2e6,  req:() => D.income > 0 },
+  { id:22, kind:'all', val:0.2, icon:'🌳', name:'Древние дубы',       desc:'Весь доход +20%', cost:2e8,  req:() => D.income > 0 },
+  { id:23, kind:'all', val:0.2, icon:'🌟', name:'Звёздные тропы',     desc:'Весь доход +20%', cost:2e10, req:() => D.income > 0 },
+  { id:24, kind:'all', val:0.2, icon:'🌈', name:'Мост из радуги',     desc:'Весь доход +20%', cost:2e12, req:() => D.income > 0 },
+];
+FOLLOWERS.forEach((f, i) => {
+  GIFTS.push({ id:100 + i*2, kind:'tier', tier:i, icon:f.icon, name:TIER_GIFT_NAMES[i][0], desc:`${f.name} приносят ×2`, cost:f.cost*10, req:() => G.f[i] >= 1 });
+  GIFTS.push({ id:101 + i*2, kind:'tier', tier:i, icon:f.icon, name:TIER_GIFT_NAMES[i][1], desc:`${f.name} приносят ×2`, cost:f.cost*50, req:() => G.f[i] >= 5 });
+});
+GIFTS.sort((a, b) => a.cost - b.cost);
+const GIFT_BY_ID = {};
+GIFTS.forEach(g => GIFT_BY_ID[g.id] = g);
+
+// ЭПОХИ. Цели подобраны симуляцией с событиями и достижениями (balance_sim.py):
+// первая ≈1 ч у идеального игрока (у живого 1,5–2,5 ч) за 2 дня, дальше дольше.
+const EPOCH_GOAL0 = 4e11, EPOCH_GOAL_MULT = 8;
+const BUILD_ROOT = 6;          // как показывать постройку: (золото / цель) ^ (1/6)
+const GRACE_PER_EPOCH = 0.5;   // Благодать: +50% ко всему доходу за каждую пройденную эпоху
+const STAGE_P = [0, .03, .12, .22, .32, .42, .52, .62, .74, .84, .93, 1];   // совпадают со слоями картинки
+const EPOCHS = [
+  { name:'Каменный круг', verb:'ВОЗДВИГНУТ', stages:['Тихая поляна', 'Разметка по солнцу', 'Первые камни',
+    'Камни встают в круг', 'Круг замкнулся', 'Каменные арки', 'Алтарный камень', 'Узоры на камнях', 'Цветы у подножия',
+    'Венки на арках', 'Костёр Белтайна', 'Каменный круг сияет'] },
+  { name:'Священная роща', verb:'РАСЦВЕЛА', stages:['Пустой луг', 'Посадка желудей', 'Первые ростки',
+    'Молодые деревца', 'Тропинки из мха', 'Кроны смыкаются', 'Цветущий подлесок', 'Ручей и мостик', 'Ленты на ветвях',
+    'Светлячки в листве', 'Птицы поют', 'Священная роща цветёт'] },
+  { name:'Дуб друидов', verb:'ВЫРОС', stages:['Холм над рекой', 'Жёлудь в земле', 'Росток',
+    'Крепкий ствол', 'Первые ветви', 'Могучая крона', 'Корни-ступени', 'Дверь в дупле', 'Омела в ветвях',
+    'Фонарики на ветвях', 'Золотые листья', 'Дуб друидов шумит'] },
+  { name:'Холм фей', verb:'ПРОСНУЛСЯ', stages:['Зелёный холм', 'Кольцо грибов', 'Круглая дверца',
+    'Окошки в холме', 'Цветы на склонах', 'Тропинка из камешков', 'Фонарики фей', 'Мостик над ручьём',
+    'Колокольчики звенят', 'Танец огоньков', 'Радуга над холмом', 'Холм фей светится'] },
+  { name:'Чертог под звёздами', verb:'ОТКРЫТ', stages:['Ночная поляна', 'Лунная дорожка', 'Серебряный фундамент',
+    'Колонны-берёзы', 'Своды из ветвей', 'Звёздная крыша', 'Окна из росы', 'Лунные фонари',
+    'Знамёна созвездий', 'Северное сияние', 'Звёздный венец', 'Чертог под звёздами сияет'] },
+];
+const STAR_STAGES = ['Пустота между звёзд', 'Звёздная пыль', 'Семена из света', 'Ростки-созвездия',
+  'Стволы из лучей', 'Кроны туманностей', 'Цветы-кометы', 'Тропы Млечного Пути', 'Хор планет', 'Светлячки-звёзды',
+  'Последние искры', 'Звёздная роща сияет'];
+function epochInfo(n) {
+  const e = n < EPOCHS.length ? EPOCHS[n] : { name:`Звёздная роща №${n - EPOCHS.length + 1}`, verb:'РАСЦВЕЛА', stages:STAR_STAGES };
+  return Object.assign({ goal: EPOCH_GOAL0 * Math.pow(EPOCH_GOAL_MULT, n) }, e);
+}
+function graceMult(ep) { return 1 + GRACE_PER_EPOCH * ep; }
+
+const OFFLINE_RATE = 0.5;          // пока её нет — половина скорости
+const OFFLINE_MAX_SEC = 12 * 3600; // и не больше 12 часов
+
+// ══════════════════════════════════════════════
+// СОСТОЯНИЕ
+// ══════════════════════════════════════════════
+
+function fresh() {
+  return {
+    v: 1,
+    t: 0,                        // метка времени сохранения
+    g: 0,                        // золото сейчас
+    ge: 0,                       // золото, заработанное за эпоху
+    gt: 0,                       // золото за всё время
+    c: 0,                        // нажатий
+    f: FOLLOWERS.map(() => 0),   // последователи по тирам
+    u: [],                       // id купленных даров
+    rv: 1,                       // сколько тиров уже открыто
+    ep: 0,                       // номер эпохи = сколько эпох пройдено (от него Благодать)
+    ws: 0,                       // торжество этой эпохи уже показано
+    h: '',                       // книга гимнов: '1' на месте собранного
+    a: [],                       // id полученных достижений
+    ev: 0,                       // поймано событий
+    dd: 0, ds: 0, dh: 0,         // ежедневный дар: последний день, серия, гимн ещё не выдан
+    md: 0,                       // день последнего утреннего дара
+    bm: 1,                       // сколько нанимать: 1, 10, 0 = максимум
+    vib: 1,                      // вибрация
+  };
+}
+let G = fresh();
+const D = { income: 0, tap: 1, each: [], tierMult: [], glob: 1, grace: 1, bought: new Set() };
+
+function recalc() {
+  D.bought = new Set(G.u);
+  const tierGifts = FOLLOWERS.map(() => 0);
+  let tapMult = 1, tapPct = 0, glob = 1;
+  for (const id of G.u) {
+    const gf = GIFT_BY_ID[id];
+    if (!gf) continue;
+    if (gf.kind === 'tier') tierGifts[gf.tier]++;
+    else if (gf.kind === 'tap') tapMult *= 2;
+    else if (gf.kind === 'pct') tapPct += 0.01;
+    else if (gf.kind === 'all') glob *= 1 + gf.val;
+  }
+  D.grace = graceMult(G.ep);
+  D.ach = 1 + ACH_BONUS * G.a.length;
+  glob *= D.grace * D.ach;
+  D.glob = glob;
+  D.tierMult = FOLLOWERS.map((f, i) => Math.pow(2, tierGifts[i] + milestonesOf(G.f[i])));
+  D.each = FOLLOWERS.map((f, i) => f.gps * D.tierMult[i] * glob);
+  D.baseIncome = D.each.reduce((s, v, i) => s + v * G.f[i], 0);
+  const now = Date.now();
+  D.raOn = now < BUFF.ra;
+  D.petalOn = now < BUFF.petal;
+  D.income = D.baseIncome * (D.raOn ? 7 : 1);
+  D.tap = (tapMult * D.grace + D.income * tapPct) * (D.petalOn ? 10 : 1);
+}
+const BUFF = { ra: 0, petal: 0 };   // до какого момента действуют «Благословение Ра» и «Дождь лепестков»
+function milestonesOf(n) { let k = 0; for (const m of MILESTONES) if (n >= m) k++; return k; }
+function totalFollowers() { return G.f.reduce((a, b) => a + b, 0); }
+
+function addGold(x) { G.g += x; G.ge += x; G.gt += x; }
+
+// ══════════════════════════════════════════════
+// ЧИСЛА ПО-РУССКИ
+// ══════════════════════════════════════════════
+
+const UNITS = ['', 'тыс.', 'млн', 'млрд', 'трлн', 'квадрлн', 'квинтлн', 'секстлн', 'септлн', 'октлн', 'нонлн', 'децлн'];
+function fmt(n, withDecimals) {
+  if (!isFinite(n)) return '∞';
+  if (n < 1000) {
+    if (withDecimals && n < 100 && n % 1) return String(Math.floor(n * 10) / 10).replace('.', ',');
+    return String(Math.floor(n));
+  }
+  let e = Math.floor(Math.log10(n) / 3);
+  if (e >= UNITS.length) return n.toExponential(2).replace('.', ',');
+  let v = n / Math.pow(1000, e);
+  if (v >= 1000) { v /= 1000; e++; }
+  const s = v < 100 ? String(Math.floor(v * 10) / 10) : String(Math.floor(v));
+  return s.replace('.', ',') + ' ' + UNITS[e];
+}
+
+// ══════════════════════════════════════════════
+// TELEGRAM
+// ══════════════════════════════════════════════
+
+const TG = window.Telegram && window.Telegram.WebApp;
+const inTG = !!(TG && TG.initData);
+function tgAtLeast(v) { try { return inTG && TG.isVersionAtLeast(v); } catch (e) { return false; } }
+const cloudOK = tgAtLeast('6.9') && !!TG.CloudStorage;
+
+function initTelegram() {
+  if (!inTG) return;
+  const tries = [
+    () => TG.ready(),
+    () => TG.expand(),
+    () => { if (tgAtLeast('7.7')) TG.disableVerticalSwipes(); },
+    () => { if (tgAtLeast('6.1')) { TG.setHeaderColor('#0b170e'); TG.setBackgroundColor('#060d07'); } },
+    () => { if (tgAtLeast('7.10')) TG.setBottomBarColor('#08120a'); },
+    () => { TG.onEvent('deactivated', saveNow); },
+  ];
+  for (const f of tries) { try { f(); } catch (e) {} }
+}
+
+let lastHaptic = 0;
+let userTouched = false;   // браузер не даёт вибрировать до первого касания
+document.addEventListener('pointerdown', () => { userTouched = true; }, { capture:true, once:true });
+function haptic(kind) {
+  if (!G.vib) return;
+  const now = performance.now();
+  if (kind === 'tap') { if (now - lastHaptic < 50) return; lastHaptic = now; }
+  try {
+    if (tgAtLeast('6.1')) {
+      if (kind === 'tap') TG.HapticFeedback.impactOccurred('light');
+      else TG.HapticFeedback.notificationOccurred('success');
+    } else if (navigator.vibrate && userTouched) {
+      navigator.vibrate(kind === 'tap' ? 8 : [20, 40, 20]);
+    }
+  } catch (e) {}
+}
+
+// ══════════════════════════════════════════════
+// СОХРАНЕНИЕ (облако Telegram + localStorage, без кнопок)
+// ══════════════════════════════════════════════
+
+const LS_KEY = 'les_zheni_v1';
+const CS_KEY = 'save_les';
+let cloudReady = false;   // писать в облако только после того, как прочитали его (иначе затрём прогресс)
+let loadedAt = 0;         // метка времени того сохранения, с которого стартовали
+let saveTimer = null;
+
+function serialize() { G.t = Date.now(); return JSON.stringify(G); }
+
+function saveNow() {
+  clearTimeout(saveTimer); saveTimer = null;
+  const s = serialize();
+  try { localStorage.setItem(LS_KEY, s); } catch (e) {}
+  if (cloudOK && cloudReady) { try { TG.CloudStorage.setItem(CS_KEY, s, () => {}); } catch (e) {} }
+}
+function markDirty() { if (!saveTimer) saveTimer = setTimeout(saveNow, 5000); }
+
+function parseSave(s) {
+  try {
+    const o = typeof s === 'string' ? JSON.parse(s) : s;
+    if (!o || typeof o !== 'object' || typeof o.g !== 'number') return null;
+    const st = Object.assign(fresh(), o);
+    st.f = FOLLOWERS.map((_, i) => Math.max(0, Math.floor(+(o.f && o.f[i]) || 0)));
+    st.u = Array.isArray(o.u) ? o.u.filter(id => GIFT_BY_ID[id]) : [];
+    st.a = Array.isArray(o.a) ? o.a.filter(id => ACH_BY_ID[id]) : [];
+    st.h = typeof o.h === 'string' ? o.h.replace(/[^01]/g, '0') : '';
+    return st;
+  } catch (e) { return null; }
+}
+
+function loadAll(cb) {
+  let local = null;
+  try { local = parseSave(localStorage.getItem(LS_KEY)); } catch (e) {}
+  if (!cloudOK) { cb(local); return; }
+
+  let done = false;
+  const finish = (cloud) => {
+    if (done) return; done = true;
+    cloudReady = true;
+    cb(cloud && (!local || cloud.t > local.t) ? cloud : local);
+  };
+  const ask = (onValue) => {
+    try {
+      TG.CloudStorage.getItem(CS_KEY, (err, val) => onValue(err ? undefined : (val ? parseSave(val) : null)));
+    } catch (e) { onValue(undefined); }
+  };
+  ask(cloud => { if (cloud !== undefined) finish(cloud); });
+  // Облако долго молчит — стартуем с локального, а облако дочитаем позже
+  setTimeout(() => {
+    if (done) return;
+    done = true;
+    cb(local);
+    const retry = () => ask(cloud => {
+      if (cloud === undefined) { setTimeout(retry, 5000); return; }
+      cloudReady = true;
+      if (cloud && cloud.t > loadedAt) { adopt(cloud); toast('☁️ Прогресс загружен из облака'); }
+      saveNow();
+    });
+    retry();
+  }, 4000);
+}
+
+function adopt(st) {
+  G = st || fresh();
+  loadedAt = G.t || 0;
+  recalc();
+  if (G.t) applyAbsence((Date.now() - G.t) / 1000, 'modal');
+  renderAll();
+}
+
+// Пока её не было: половина скорости, максимум 12 часов
+function applyAbsence(sec, how) {
+  if (!(sec > 60) || D.baseIncome <= 0) return;
+  const gain = D.baseIncome * Math.min(sec, OFFLINE_MAX_SEC) * OFFLINE_RATE;
+  addGold(gain);
+  if (gain < 1) return;
+  if (how === 'modal') {
+    modal('Пока Богиня отдыхала…', `…лесной народ собрал ${fmt(gain)} золота и сложил его у старого дуба.`, [{ text:'Чудесно 🌿', cls:'main' }]);
+  } else {
+    toast(`Пока Богиня отдыхала, лесной народ собрал ${fmt(gain)} золота`);
+  }
+}
+
+// ══════════════════════════════════════════════
+// КОМПЛИМЕНТЫ
+// ══════════════════════════════════════════════
+
+let compBag = [];
+function nextCompliment() {
+  if (!compBag.length) {
+    compBag = HYMNS.map((_, i) => i);
+    for (let i = compBag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [compBag[i], compBag[j]] = [compBag[j], compBag[i]]; }
+  }
+  return HYMNS[compBag.pop()];
+}
+
+// ══════════════════════════════════════════════
+// КНИГА ГИМНОВ
+// ══════════════════════════════════════════════
+
+const TAP_CARD_EVERY = 25, TAP_CARD_CHANCE = 0.03;   // каждые 25 нажатий — шанс 3%
+const EVENT_CARD_CHANCE = 0.3;
+const FOLLOWERS_CARD_EVERY = 50;                     // каждые 50 нанятых за эпоху — гимн
+
+function hasHymn(i) { return G.h.charAt(i) === '1'; }
+function hymnCount() { let n = 0; for (const ch of G.h) if (ch === '1') n++; return n; }
+// Выдать случайный несобранный гимн (редкие выпадают реже). Возвращает true, если выпал.
+function dropHymn() {
+  const pool = [];
+  let total = 0;
+  HYMNS.forEach((_, i) => { if (!hasHymn(i)) { const w = RARITY_WEIGHT[RARITY[i]]; pool.push([i, w]); total += w; } });
+  if (!total) return false;
+  let r = Math.random() * total, pick = pool[0][0];
+  for (const [i, w] of pool) { r -= w; if (r <= 0) { pick = i; break; } }
+  G.h = G.h.padEnd(HYMNS.length, '0');
+  G.h = G.h.slice(0, pick) + '1' + G.h.slice(pick + 1);
+  showCard(pick);
+  bookDirty = true;
+  markDirty();
+  return true;
+}
+
+const cardQueue = [];
+let cardTimer = null;
+function showCard(i) {
+  if ($('card').classList.contains('show')) { cardQueue.push(i); return; }
+  const box = $('card');
+  box.className = 'show r' + RARITY[i];
+  $('ctag').textContent = '✦ Новая ' + RARITY_NAME[RARITY[i]] + ' ✦';
+  $('ctext').textContent = HYMNS[i];
+  $('chint').textContent = `В книге: ${hymnCount()} из ${HYMNS.length}`;
+  haptic('event');
+  clearTimeout(cardTimer);
+  cardTimer = setTimeout(hideCard, RARITY[i] === 2 ? 6000 : 4000);
+}
+function hideCard() {
+  clearTimeout(cardTimer);
+  $('card').className = '';
+  if (cardQueue.length) setTimeout(() => showCard(cardQueue.shift()), 250);
+}
+
+let bookDirty = true;
+function renderBook() {
+  if (!bookDirty || !$('p-book').classList.contains('on')) return;
+  bookDirty = false;
+  $('book-count').textContent = `Собрано ${hymnCount()} из ${HYMNS.length}`;
+  const list = $('book-list');
+  list.innerHTML = '';
+  const got = [], locked = [];
+  HYMNS.forEach((t, i) => (hasHymn(i) ? got : locked).push(i));
+  got.sort((a, b) => RARITY[b] - RARITY[a]);   // легендарные сверху
+  for (const i of got.concat(locked)) {
+    const d = document.createElement('div');
+    if (hasHymn(i)) { d.className = 'hymn r' + RARITY[i]; d.textContent = HYMNS[i]; }
+    else { d.className = 'hymn locked'; d.textContent = '???'; }
+    list.appendChild(d);
+  }
+}
+// Комплимент меняется спокойно: раз в COMPLIMENT_SEC (Виталь: игра расслабляющая, чтобы успевала прочитать),
+// а сразу — только в особый момент (поймала посланника, новая эпоха)
+const COMPLIMENT_SEC = 55;
+let complimentAt = 0, complimentFade = null;
+function showCompliment() {
+  const el = $('rtext');
+  complimentAt = Date.now();
+  if (!el.textContent) { el.textContent = nextCompliment(); return; }
+  clearTimeout(complimentFade);
+  el.classList.add('out');
+  complimentFade = setTimeout(() => { el.textContent = nextCompliment(); el.classList.remove('out'); }, 800);
+}
+function maybeCompliment() {
+  if (!document.hidden && Date.now() - complimentAt >= COMPLIMENT_SEC * 1000) showCompliment();
+}
+
+// ══════════════════════════════════════════════
+// НАЖАТИЕ НА СОЛНЦЕ
+// ══════════════════════════════════════════════
+
+function tapSun(x, y) {
+  G.c++;
+  const gain = D.tap;
+  addGold(gain);
+  floatNum('+' + fmt(gain, true), x, y);
+  sparks(x, y, 3, 45, 0.55);
+  haptic('tap');
+  $('sun').animate([{ transform:'scale(.93)' }, { transform:'scale(1)' }], { duration:160, easing:'ease-out' });
+  if (G.c % TAP_CARD_EVERY === 0 && Math.random() < TAP_CARD_CHANCE) dropHymn();
+  if (G.c === 5) $('hint').style.display = 'none';
+  updateTop();
+  markDirty();
+}
+
+const MAX_FLOATS = 20;
+function floatNum(text, x, y) {
+  const layer = $('floats');
+  if (layer.childElementCount >= MAX_FLOATS) layer.firstElementChild.remove();
+  const d = document.createElement('div');
+  d.className = 'fl';
+  d.textContent = text;
+  d.style.setProperty('--x', (x - 20 + (Math.random() * 16 - 8)) + 'px');
+  d.style.setProperty('--y', (y - 30) + 'px');
+  d.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px');
+  d.addEventListener('animationend', () => d.remove());
+  layer.appendChild(d);
+}
+
+// ══════════════════════════════════════════════
+// ПОКУПКИ
+// ══════════════════════════════════════════════
+
+function bulkCost(i, n) {
+  const base = FOLLOWERS[i].cost * Math.pow(COST_GROWTH, G.f[i]);
+  return Math.ceil(base * (Math.pow(COST_GROWTH, n) - 1) / (COST_GROWTH - 1));
+}
+function maxAffordable(i) {
+  const base = FOLLOWERS[i].cost * Math.pow(COST_GROWTH, G.f[i]);
+  let n = Math.floor(Math.log(G.g * (COST_GROWTH - 1) / base + 1) / Math.log(COST_GROWTH));
+  while (n > 0 && bulkCost(i, n) > G.g) n--;
+  return Math.max(0, n);
+}
+function buyCount(i) {
+  if (G.bm === 0) return Math.max(1, maxAffordable(i));
+  return G.bm;
+}
+
+function buyFollower(i) {
+  const n = buyCount(i);
+  const cost = bulkCost(i, n);
+  if (cost > G.g) return;
+  const f = FOLLOWERS[i];
+  const before = milestonesOf(G.f[i]);
+  const totalBefore = totalFollowers();
+  G.g -= cost;
+  G.f[i] += n;
+  if (Math.floor(totalFollowers() / FOLLOWERS_CARD_EVERY) > Math.floor(totalBefore / FOLLOWERS_CARD_EVERY)) dropHymn();
+  const after = milestonesOf(G.f[i]);
+  if (after > before) {
+    toast(`${f.icon} ${f.gen} уже ${MILESTONES[after - 1]}! Их доход ×${Math.pow(2, after - before)}`);
+    haptic('event');
+  }
+  recalc();
+  updateAll();
+  markDirty();
+}
+
+function buyGift(id) {
+  const gf = GIFT_BY_ID[id];
+  if (!gf || D.bought.has(id) || gf.cost > G.g) return;
+  G.g -= gf.cost;
+  G.u.push(id);
+  toast(`${gf.icon} ${gf.name}: ${gf.desc.charAt(0).toLowerCase() + gf.desc.slice(1)}`);
+  haptic('event');
+  recalc();
+  updateAll();
+  markDirty();
+}
+
+// ══════════════════════════════════════════════
+// ОТРИСОВКА
+// ══════════════════════════════════════════════
+
+const $ = id => document.getElementById(id);
+function setT(el, s) { if (el._t !== s) { el._t = s; el.textContent = s; } }
+function setC(el, cls, on) { if (el.classList.contains(cls) !== on) el.classList.toggle(cls, on); }
+function setShow(el, on) { const v = on ? '' : 'none'; if (el.style.display !== v) el.style.display = v; }
+
+const folRows = [];
+let mysteryRow = null;
+function buildFollowers() {
+  const list = $('fol-list');
+  list.innerHTML = '';
+  FOLLOWERS.forEach((f, i) => {
+    const r = document.createElement('div');
+    r.className = 'row';
+    r.innerHTML = `<div class="ic">${f.icon}</div>
+      <div class="info"><div class="nm">${f.name}<span class="cnt"></span></div>
+      <div class="sub">${f.role}</div><div class="sub2"></div></div>
+      <button class="buy"><span class="bq"></span><span class="bc"></span></button>`;
+    const btn = r.querySelector('.buy');
+    btn.addEventListener('click', () => buyFollower(i));
+    folRows.push({ r, cnt: r.querySelector('.cnt'), sub2: r.querySelector('.sub2'), btn, bq: r.querySelector('.bq'), bc: r.querySelector('.bc') });
+    list.appendChild(r);
+  });
+  mysteryRow = document.createElement('div');
+  mysteryRow.className = 'row mystery';
+  mysteryRow.innerHTML = `<div class="ic">❔</div><div class="info"><div class="nm">???</div><div class="sub"></div></div>`;
+  list.appendChild(mysteryRow);
+}
+
+const giftRows = {};
+const giftSeen = new Set();
+function buildGifts() {
+  const list = $('gift-list');
+  list.innerHTML = '';
+  for (const gf of GIFTS) {
+    const r = document.createElement('div');
+    r.className = 'row';
+    r.innerHTML = `<div class="ic">${gf.icon}</div>
+      <div class="info"><div class="nm">${gf.name}</div><div class="sub">${gf.desc}</div></div>
+      <button class="buy"><span class="bq">Принять</span><span class="bc">${fmt(gf.cost)}</span></button>`;
+    const btn = r.querySelector('.buy');
+    btn.addEventListener('click', () => buyGift(gf.id));
+    giftRows[gf.id] = { r, btn };
+    list.appendChild(r);
+  }
+}
+
+function updateTop() {
+  setT($('gold'), fmt(G.g));
+  setT($('rate'), fmt(D.income, true));
+  setT($('tapv'), fmt(D.tap, true));
+}
+
+let lastStage = -1;
+function updateBuild(announce) {
+  const ep = epochInfo(G.ep);
+  // Золото растёт лавиной: в прямых процентах храм стоял бы на 0% почти всю эпоху.
+  // Корень 6-й степени по симуляции идёт вровень со временем игры (10 мин ≈ 20%, полчаса ≈ 57%).
+  const p = Math.pow(Math.min(1, G.ge / ep.goal), 1 / BUILD_ROOT);
+  let si = 0;
+  STAGE_P.forEach((sp, k) => { if (p >= sp) si = k; });
+  setT($('bname'), ep.name);
+  setT($('bstage'), ep.stages[si]);
+  setT($('bpct'), Math.floor(p * 100) + '%');
+  $('bfill').style.width = (p * 100).toFixed(1) + '%';
+  const pic = G.ep < EPOCHS.length ? String(G.ep) : 'star';
+  const svg = document.querySelector('.temple');
+  if (svg.dataset.ep !== pic) svg.dataset.ep = pic;
+  svg.querySelectorAll('.tl').forEach(el => {
+    const on = p >= +el.dataset.p;
+    if (on && announce && !el.classList.contains('on') && el.closest('.ep') && getComputedStyle(el.closest('.ep')).display !== 'none') {
+      el.classList.add('pop');
+      setTimeout(() => el.classList.remove('pop'), 1200);
+    }
+    setC(el, 'on', on);
+  });
+  setShow($('btn-epoch'), p >= 1);
+  if (announce && lastStage >= 0 && si > lastStage && p < 1) {
+    toast(`🌿 ${ep.name}: ${ep.stages[si].toLowerCase()}`);
+    haptic('event');
+    celebrate();
+  }
+  lastStage = si;
+  if (p >= 1 && !G.ws) { G.ws = 1; markDirty(); setTimeout(showWin, 600); }
+}
+
+// Новая стадия постройки: вспышка и сноп искр от храма
+function celebrate() {
+  const fl = $('flash');
+  fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  const r = document.querySelector('.temple').getBoundingClientRect();
+  sparks(r.left + r.width / 2, r.top + r.height * 0.55, 18, 110, 1.1);
+}
+
+// Искры: n штук из точки (x, y), разлёт до dist px
+const MAX_SPARKS = 40;
+function sparks(x, y, n, dist, sec) {
+  const layer = $('floats');
+  for (let i = 0; i < n; i++) {
+    if (layer.querySelectorAll('.spark').length >= MAX_SPARKS) return;
+    const s = document.createElement('div');
+    s.className = 'spark';
+    const a = Math.random() * Math.PI * 2, d = dist * (0.45 + Math.random() * 0.55);
+    s.style.setProperty('--x', (x - 3) + 'px');
+    s.style.setProperty('--y', (y - 3) + 'px');
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    s.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    s.style.setProperty('--t', (sec * (0.7 + Math.random() * 0.3)) + 's');
+    s.addEventListener('animationend', () => s.remove());
+    layer.appendChild(s);
+  }
+}
+
+// Последователи у подножия: 1 фигурка на тир, 2 — от 10 штук, 3 — от 50; всего не больше 16
+const MAX_FIGS = 16;
+let crowdSig = '';
+function updateCrowd() {
+  const plan = [];
+  for (let i = FOLLOWERS.length - 1; i >= 0; i--) {
+    const n = G.f[i] >= 50 ? 3 : G.f[i] >= 10 ? 2 : G.f[i] > 0 ? 1 : 0;
+    for (let k = 0; k < n && plan.length < MAX_FIGS; k++) plan.push(i);
+  }
+  const box = $('crowd');
+  const sig = plan.join(',') + '|' + box.clientWidth;
+  if (sig === crowdSig) return;
+  crowdSig = sig;
+  const w = box.clientWidth;
+  const keep = new Map();   // фигурки, что уже ходят, не перезапускаем
+  box.querySelectorAll('.fig').forEach(el => { const t = el.dataset.t; (keep.get(t) || keep.set(t, []).get(t)).push(el); });
+  const used = new Set();
+  plan.forEach((tier, k) => {
+    const list = keep.get(String(tier));
+    let el = list && list.find(e => !used.has(e));
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'fig';
+      el.dataset.t = tier;
+      el.innerHTML = `<span class="who"></span><span class="carry"></span>`;
+      el.querySelector('.who').textContent = (k % 2) ? '🚶‍♀️' : '🚶';
+      el.querySelector('.carry').textContent = FOLLOWERS[tier].icon;
+      const a = 30 + Math.random() * (w - 90), b = Math.min(w - 40, a + 40 + Math.random() * (w * 0.45));
+      el.style.setProperty('--a', a + 'px');
+      el.style.setProperty('--b', b + 'px');
+      el.style.animationDuration = (7 + Math.random() * 9) + 's';
+      el.style.animationDelay = (-Math.random() * 10) + 's';
+      box.appendChild(el);
+    }
+    used.add(el);
+  });
+  box.querySelectorAll('.fig').forEach(el => { if (!used.has(el)) el.remove(); });
+}
+
+// Торжество: эпоха завершена
+function showWin() {
+  const ep = epochInfo(G.ep);
+  const title = `${ep.name.toUpperCase()} ${ep.verb}`;
+  $('win-title').textContent = `🌿 ${title} 🌿`;
+  const box = $('win-text');
+  box.innerHTML = '';
+  WIN_TEXTS.forEach((line, k) => {
+    const d = document.createElement('div');
+    d.textContent = line.replace('ХРАМ БОГИНИ ЖЕНИ ПОСТРОЕН', title);
+    d.style.animationDelay = (0.4 + k * 0.55) + 's';
+    box.appendChild(d);
+  });
+  $('win-sub').textContent = `Благодать вырастет: весь доход навсегда +${Math.round(GRACE_PER_EPOCH * (G.ep + 1) * 100)}%. ` +
+    `Следующая эпоха — ${epochInfo(G.ep + 1).name}.`;
+  $('win').classList.add('show');
+  haptic('event');
+}
+
+function newEpoch() {
+  const keep = { c:G.c, gt:G.gt, vib:G.vib, bm:G.bm, ep:G.ep + 1, h:G.h, a:G.a, ev:G.ev, dd:G.dd, ds:G.ds, dh:G.dh, md:G.md };
+  G = Object.assign(fresh(), keep);
+  giftSeen.clear();
+  recalc(); saveNow(); renderAll(); showCompliment();
+  $('win').classList.remove('show');
+  toast(`✨ Новая эпоха: ${epochInfo(G.ep).name}`);
+}
+
+function updateFollowers() {
+  // открываем следующий тир, когда в казне почти хватает на него
+  while (G.rv < FOLLOWERS.length && (G.g >= FOLLOWERS[G.rv].cost * 0.4 || G.f[G.rv] > 0)) {
+    const f = FOLLOWERS[G.rv];
+    G.rv++;
+    toast(`${f.icon} ${f.name} хотят служить Богине!`);
+    markDirty();
+  }
+  FOLLOWERS.forEach((f, i) => {
+    const row = folRows[i];
+    const open = i < G.rv || G.f[i] > 0;
+    setShow(row.r, open);
+    if (!open) return;
+    const n = buyCount(i);
+    const cost = bulkCost(i, n);
+    setT(row.cnt, G.f[i] ? ' · ' + G.f[i] : '');
+    const nextMs = MILESTONES.find(m => m > G.f[i]);
+    let line = `+${fmt(D.each[i], true)}/с каждый`;
+    if (G.f[i]) line += ` · всего ${fmt(D.each[i] * G.f[i], true)}/с`;
+    row.sub2.innerHTML = line + (nextMs && G.f[i] ? ` · <span class="ms">ещё ${nextMs - G.f[i]} до ×2</span>` : '');
+    setT(row.bq, 'Нанять +' + n);
+    setT(row.bc, fmt(cost));
+    setC(row.btn, 'no', cost > G.g);
+  });
+  const next = G.rv < FOLLOWERS.length ? FOLLOWERS[G.rv] : null;
+  setShow(mysteryRow, !!next);
+  if (next) setT(mysteryRow.querySelector('.sub'), `Кто-то ещё хочет служить Богине… Откроется, когда в казне будет ${fmt(next.cost * 0.4)} золота`);
+}
+
+function updateGifts() {
+  let shown = 0, affordable = 0;
+  for (const gf of GIFTS) {
+    const row = giftRows[gf.id];
+    const bought = D.bought.has(gf.id);
+    let vis = false;
+    if (!bought && gf.req()) {
+      if (G.g >= gf.cost * 0.3) giftSeen.add(gf.id);
+      vis = giftSeen.has(gf.id);
+    }
+    setShow(row.r, vis);
+    if (!vis) continue;
+    shown++;
+    const can = G.g >= gf.cost;
+    if (can) affordable++;
+    setC(row.btn, 'no', !can);
+  }
+  setShow($('gift-empty'), shown === 0);
+  setT($('gift-done'), G.u.length ? `Получено даров: ${G.u.length} из ${GIFTS.length}` : '');
+  setC($('gift-badge'), 'show', affordable > 0);
+}
+
+function updateTempleTab() {
+  setT($('st-c'), fmt(G.c));
+  setT($('st-gt'), fmt(G.gt));
+  setT($('st-f'), fmt(totalFollowers()));
+  setT($('st-u'), String(G.u.length));
+  setT($('st-ep'), String(G.ep + 1));
+  setT($('st-gr'), G.ep ? '+' + Math.round((D.grace - 1) * 100) + '%' : 'пока нет');
+  setC($('sw-vib'), 'on', !!G.vib);
+  document.querySelectorAll('.mode button').forEach(b => setC(b, 'on', +b.dataset.m === G.bm));
+}
+
+function updateAll() {
+  updateTop();
+  updateBuild(true);
+  updateFollowers();
+  updateGifts();
+  updateTempleTab();
+}
+function renderAll() {
+  lastStage = -1;
+  updateTop();
+  updateBuild(false);
+  updateFollowers();
+  updateGifts();
+  updateTempleTab();
+  $('hint').style.display = G.c >= 5 ? 'none' : '';
+}
+
+// ══════════════════════════════════════════════
+// ВСПЛЫВАШКИ И ОКНА
+// ══════════════════════════════════════════════
+
+function toast(text) {
+  const box = $('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = text;
+  box.appendChild(t);
+  while (box.children.length > 2) box.firstElementChild.remove();
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 2800);
+}
+
+const modalQueue = [];
+function modalOpen() { return $('modal').classList.contains('show') || $('win').classList.contains('show'); }
+function modal(title, text, buttons) {
+  if ($('modal').classList.contains('show')) { modalQueue.push([title, text, buttons]); return; }
+  $('mtitle').textContent = title;
+  $('mtext').textContent = text;
+  const box = $('mbtns');
+  box.innerHTML = '';
+  for (const b of buttons) {
+    const el = document.createElement('button');
+    el.textContent = b.text;
+    if (b.cls) el.className = b.cls;
+    el.addEventListener('click', () => {
+      $('modal').classList.remove('show');
+      if (b.fn) b.fn();
+      if (modalQueue.length && !$('modal').classList.contains('show')) setTimeout(() => modal(...modalQueue.shift()), 200);
+    });
+    box.appendChild(el);
+  }
+  $('modal').classList.add('show');
+}
+
+function askReset() {
+  modal('Сбросить всё?', 'Золото, последователи и дары исчезнут.', [
+    { text:'Отмена', cls:'main' },
+    { text:'Сбросить', cls:'danger', fn:() => modal('Точно-точно?', 'Это нельзя отменить. Рощу придётся растить с самого начала.', [
+      { text:'Нет, оставить', cls:'main' },
+      { text:'Да, сбросить', cls:'danger', fn:() => {
+        const vib = G.vib;
+        G = fresh(); G.vib = vib;
+        giftSeen.clear();
+        recalc(); saveNow(); renderAll(); showCompliment();
+        toast('Роща начинается заново 🌿');
+      } },
+    ]) },
+  ]);
+}
+
+// ══════════════════════════════════════════════
+// СЛУЧАЙНЫЕ СОБЫТИЯ: сокол Гора и золотой скарабей
+// ══════════════════════════════════════════════
+
+const EVENT_MIN_SEC = 90, EVENT_MAX_SEC = 240, EVENT_FLY_SEC = 8;
+let nextEventAt = Date.now() + 40000;   // первый — побыстрее, чтобы она его увидела
+function scheduleEvent() { nextEventAt = Date.now() + (EVENT_MIN_SEC + Math.random() * (EVENT_MAX_SEC - EVENT_MIN_SEC)) * 1000; }
+
+function maybeEvent() {
+  if (Date.now() < nextEventAt || document.hidden || modalOpen() || document.querySelector('.critter')) return;
+  scheduleEvent();
+  const fairy = Math.random() < 0.5;
+  const c = document.createElement('button');
+  c.className = 'critter ' + (fairy ? 'fairy' : 'deer');
+  c.textContent = fairy ? '🧚' : '🦌';
+  c.setAttribute('aria-label', fairy ? 'Лесная фея' : 'Белый олень');
+  c.style.top = (fairy ? 12 + Math.random() * 38 : 34 + Math.random() * 22) + '%';   // фея летает, олень бежит пониже
+  c.style.animationDuration = EVENT_FLY_SEC + 's';
+  c.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); catchEvent(c, fairy, e.clientX, e.clientY); }, { once:true });
+  c.addEventListener('animationend', () => c.remove());
+  $('scene').appendChild(c);
+}
+
+function catchEvent(el, fairy, x, y) {
+  el.remove();
+  G.ev++;
+  const who = fairy ? 'Лесная фея' : 'Белый олень';
+  const brought = fairy ? 'принесла' : 'принёс', led = fairy ? 'привела' : 'привёл';
+  const r = Math.random();
+  if (r < 0.34) {
+    BUFF.ra = Date.now() + 30000;
+    toast(`☀️ ${who} ${brought} благословение Солнца! Доход ×7 на 30 секунд`);
+  } else if (r < 0.67) {
+    const gain = Math.max(D.baseIncome * 900, D.tap * 60, 50);
+    addGold(gain);
+    floatNum('+' + fmt(gain), x, y);
+    toast(`🧺 ${who} ${led} к роще дары леса: +${fmt(gain)} золота`);
+  } else {
+    BUFF.petal = Date.now() + 15000;
+    Live.burst(15);
+    toast(`🌸 ${who} ${brought} дождь лепестков! Нажатия ×10 на 15 секунд`);
+  }
+  haptic('event');
+  recalc();
+  showCompliment();
+  if (Math.random() < EVENT_CARD_CHANCE) setTimeout(dropHymn, 900);
+  updateAll();
+  markDirty();
+}
+
+function updateBuffLine() {
+  const now = Date.now();
+  if ((D.raOn && now >= BUFF.ra) || (D.petalOn && now >= BUFF.petal)) { recalc(); updateAll(); }
+  const parts = [];
+  if (D.raOn) parts.push(`☀️ Благословение Солнца ×7 · ${Math.ceil((BUFF.ra - now) / 1000)} с`);
+  if (D.petalOn) parts.push(`🌸 Нажатия ×10 · ${Math.ceil((BUFF.petal - now) / 1000)} с`);
+  setT($('buff'), parts.join('   '));
+  setShow($('buff'), parts.length > 0);
+}
+
+// ══════════════════════════════════════════════
+// ЕЖЕДНЕВНЫЙ ДАР и УТРЕННИЙ ДАР (день меняется в 5 утра)
+// ══════════════════════════════════════════════
+
+function dayNum() { return Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000 - 5 * 3600000) / 86400000); }
+function hourNow() { const q = new URLSearchParams(location.search); return q.has('hour') ? +q.get('hour') : new Date().getHours(); }
+
+function checkDaily() {
+  const today = dayNum();
+  if (G.dh && G.dd === today && !modalOpen()) { G.dh = 0; setTimeout(dropHymn, 1200); }   // закрыла игру, не приняв дар
+  if (G.dd < today) {
+    G.ds = G.dd === today - 1 ? Math.min(7, G.ds + 1) : 1;
+    G.dd = today;
+    G.dh = 1;
+    const day = G.ds;
+    const gain = Math.max((D.baseIncome * 300 + D.tap * 100) * day, 100 * day);
+    addGold(gain);
+    markDirty();
+    const dots = '☀️'.repeat(day) + ' ○'.repeat(7 - day);
+    modal(`Ежедневный дар · день ${day} из 7`,
+      `${dots}\nЛесной народ приносит ${fmt(gain)} золота и новую песню.` + (day < 7 ? '\nЗаходи завтра — дар будет щедрее!' : '\nСемь дней подряд! Дар самый щедрый.'),
+      [{ text:'Принять дар', cls:'main', fn:() => { if (G.dh) { G.dh = 0; dropHymn(); } updateAll(); } }]);
+  }
+  const h = hourNow();
+  if (h >= 6 && h < 11 && G.md < today) {
+    G.md = today;
+    const gain = Math.max(D.baseIncome * 600 + D.tap * 50, 50);
+    addGold(gain);
+    markDirty();
+    setTimeout(() => toast(`🌅 Утренний дар: роща встречает Богиню ${fmt(gain)} золота`), 1500);
+  }
+}
+
+// ══════════════════════════════════════════════
+// ДОСТИЖЕНИЯ (каждое +1% ко всему доходу навсегда)
+// ══════════════════════════════════════════════
+
+const ACH_BONUS = 0.01;
+// id не менять: по ним хранится, что получено
+const ACHIEVEMENTS = [
+  { id:1,  icon:'👆', name:'Первое касание',       desc:'Нажать на солнце',              test:() => G.c >= 1 },
+  { id:2,  icon:'✋', name:'Сто подношений',        desc:'100 нажатий',                   test:() => G.c >= 100 },
+  { id:3,  icon:'🙌', name:'Тысяча подношений',     desc:'1 000 нажатий',                 test:() => G.c >= 1000 },
+  { id:4,  icon:'💪', name:'Неутомимая',            desc:'10 000 нажатий',                test:() => G.c >= 10000 },
+  { id:5,  icon:'🌞', name:'Повелительница солнца', desc:'50 000 нажатий',                test:() => G.c >= 50000 },
+  { id:6,  icon:'🌿', name:'Первый помощник',       desc:'Позвать первого последователя', test:() => totalFollowers() >= 1 },
+  { id:7,  icon:'👥', name:'Целая деревня',         desc:'100 последователей сразу',      test:() => totalFollowers() >= 100 },
+  { id:8,  icon:'🏘️', name:'Лесной народ',          desc:'500 последователей сразу',      test:() => totalFollowers() >= 500 },
+  { id:9,  icon:'✨', name:'Тайны рощи',            desc:'Позвать Верховного друида',     test:() => G.f[11] >= 1 },
+  { id:10, icon:'🪙', name:'Первая казна',          desc:'Собрать 1 тыс. золота за всё время', test:() => G.gt >= 1e3 },
+  { id:11, icon:'💰', name:'Миллион',               desc:'1 млн золота за всё время',     test:() => G.gt >= 1e6 },
+  { id:12, icon:'🏆', name:'Миллиард',              desc:'1 млрд золота за всё время',    test:() => G.gt >= 1e9 },
+  { id:13, icon:'💎', name:'Триллион',              desc:'1 трлн золота за всё время',    test:() => G.gt >= 1e12 },
+  { id:14, icon:'👑', name:'Клад под холмом',       desc:'1 квадрлн золота за всё время', test:() => G.gt >= 1e15 },
+  { id:15, icon:'🦌', name:'Зоркий глаз',           desc:'Поймать оленя или фею',         test:() => G.ev >= 1 },
+  { id:16, icon:'🧚', name:'Ловкие руки',           desc:'Поймать 10 посланников',        test:() => G.ev >= 10 },
+  { id:17, icon:'🌟', name:'Любимица леса',         desc:'Поймать 50 посланников',        test:() => G.ev >= 50 },
+  { id:18, icon:'🌄', name:'Каменный круг',         desc:'Завершить первую эпоху',        test:() => G.ep >= 1 },
+  { id:19, icon:'🌳', name:'Три эпохи',             desc:'Завершить три эпохи',           test:() => G.ep >= 3 },
+  { id:20, icon:'🌙', name:'Дорога к звёздам',      desc:'Открыть Чертог под звёздами',   test:() => G.ep >= 5 },
+  { id:21, icon:'📜', name:'Первые песни',          desc:'Собрать 10 песен',              test:() => hymnCount() >= 10 },
+  { id:22, icon:'📖', name:'Полкниги',              desc:'Собрать 60 песен',              test:() => hymnCount() >= 60 },
+  { id:23, icon:'💖', name:'Вся книга песен',       desc:'Собрать все песни',             test:() => hymnCount() >= HYMNS.length },
+  { id:24, icon:'📅', name:'Неделя в роще',         desc:'Ежедневный дар 7 дней подряд',  test:() => G.ds >= 7 },
+];
+const ACH_BY_ID = {};
+ACHIEVEMENTS.forEach(a => ACH_BY_ID[a.id] = a);
+
+let achDirty = true;
+function checkAchievements() {
+  const have = new Set(G.a);
+  let got = false;
+  for (const a of ACHIEVEMENTS) {
+    if (have.has(a.id) || !a.test()) continue;
+    G.a.push(a.id);
+    got = true;
+    toast(`🏅 Достижение «${a.name}»: весь доход +1%`);
+    haptic('event');
+  }
+  if (got) { achDirty = true; recalc(); markDirty(); }
+}
+function renderAchievements() {
+  if (!achDirty || !$('p-temple').classList.contains('on')) return;
+  achDirty = false;
+  const have = new Set(G.a);
+  $('ach-head').textContent = `Достижения · ${G.a.length} из ${ACHIEVEMENTS.length} · доход +${G.a.length}%`;
+  const list = $('ach-list');
+  list.innerHTML = '';
+  for (const a of ACHIEVEMENTS.filter(a => have.has(a.id)).concat(ACHIEVEMENTS.filter(a => !have.has(a.id)))) {
+    const d = document.createElement('div');
+    d.className = 'ach' + (have.has(a.id) ? ' got' : '');
+    d.innerHTML = `<span class="ai"></span><span class="at"><b></b><i></i></span>`;
+    d.querySelector('.ai').textContent = have.has(a.id) ? a.icon : '🔒';
+    d.querySelector('b').textContent = a.name;
+    d.querySelector('i').textContent = a.desc;
+    list.appendChild(d);
+  }
+}
+
+// ══════════════════════════════════════════════
+// НЕБО ПО ВРЕМЕНИ СУТОК
+// ══════════════════════════════════════════════
+
+function phaseOf(h) {
+  if (h >= 5 && h < 9) return 'dawn';
+  if (h >= 9 && h < 17) return 'day';
+  if (h >= 17 && h < 21) return 'sunset';
+  return 'night';
+}
+function updateSky() {
+  const q = new URLSearchParams(location.search);
+  const h = q.has('hour') ? +q.get('hour') : new Date().getHours();   // ?hour=22 — для проверки
+  $('scene').dataset.phase = phaseOf(h);
+  Live.setPhase(phaseOf(h));
+}
+function makeStars() {
+  const box = $('stars');
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 1;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 62}%;` +
+      `--d:${2 + Math.random() * 4}s;--delay:${-Math.random() * 6}s;--o:${0.5 + Math.random() * 0.5}`;
+    box.appendChild(s);
+  }
+}
+
+// ══════════════════════════════════════════════
+// ИГРОВОЙ ЦИКЛ
+// ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// ЖИВАЯ СЦЕНА (canvas): лучи сквозь кроны, туман, пыльца/светлячки, листья и лепестки.
+// Под слабые телефоны: ~30 кадров в секунду, мало частиц, стоп когда игра не видна.
+// ══════════════════════════════════════════════
+
+const Live = (() => {
+  const cv = $('live'), ctx = cv.getContext('2d');
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const N_MOTES = calm ? 8 : 18, N_FALLS = calm ? 3 : 7, N_BURST = 16, FRAME_MS = 32;
+  const q = new URLSearchParams(location.search);
+  const mon = new Date().getMonth();
+  const season = q.get('season') || (mon === 11 || mon <= 1 ? 'winter' : mon <= 4 ? 'spring' : mon <= 7 ? 'summer' : 'autumn');
+  const FALL_COLORS = {
+    spring: ['#ffc4dc', '#ffd9e8', '#fff0f6', '#9fd27a'],
+    summer: ['#7cc46a', '#5aa85a', '#ffd0e0', '#a8dc78'],
+    autumn: ['#e8a33a', '#d9702a', '#f2c94c', '#c0612e'],
+    winter: ['#ffffff', '#eef6ff'],
+  };
+  const PETALS = ['#ffc4dc', '#ff9cc0', '#ffe0ec', '#fff3a0'];
+  // свет и туман по времени суток
+  const LOOK = {
+    dawn:   { ray:'255,214,180', rayA:.20, fogA:.45, fire:false },
+    day:    { ray:'255,250,215', rayA:.16, fogA:.20, fire:false },
+    sunset: { ray:'255,185,120', rayA:.20, fogA:.28, fire:false },
+    night:  { ray:'190,210,255', rayA:.06, fogA:.22, fire:true },
+  };
+  let W = 0, H = 0, dpr = 1, phase = 'day', running = false, raf = 0, lastT = 0, t = 0, burstUntil = 0;
+  const motes = [], falls = [], fogs = [], RAYS = [{ x:.08, w:22, k:0 }, { x:.42, w:38, k:2.1 }, { x:.74, w:18, k:4.2 }];
+
+  function sprite(size, rgb) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d'), r = size / 2, gr = g.createRadialGradient(r, r, 0, r, r, r);
+    gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(.3, `rgba(${rgb},.45)`); gr.addColorStop(1, `rgba(${rgb},0)`);
+    g.fillStyle = gr; g.fillRect(0, 0, size, size);
+    return c;
+  }
+  const POLLEN = sprite(32, '255,236,160'), FIREFLY = sprite(32, '214,255,130'), FOG = sprite(128, '255,255,255');
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+
+  function resetMote(m, anywhere) {
+    m.x = rnd(0, W); m.y = anywhere ? rnd(H * .1, H * .9) : H * rnd(.75, .95);
+    m.vx = rnd(-5, 5); m.vy = rnd(-8, -2); m.r = rnd(1.1, 2.3); m.ph = rnd(0, 6.3); m.sp = rnd(.7, 1.8);
+    return m;
+  }
+  function resetFall(f, burst, anywhere) {
+    f.burst = !!burst;
+    f.x = rnd(-20, W * .95); f.y = anywhere ? rnd(0, H) : rnd(-40, -8);
+    f.vy = burst ? rnd(26, 44) : rnd(13, 24); f.vx = rnd(3, 12); f.sw = rnd(8, 22);
+    f.ph = rnd(0, 6.3); f.rot = rnd(0, 6.3); f.vr = rnd(-1.4, 1.4); f.flip = rnd(1.4, 3.2);
+    f.snow = !burst && season === 'winter';
+    f.petal = burst || (season === 'spring' && Math.random() < .6);
+    f.size = f.snow ? rnd(1.2, 2.4) : burst ? rnd(3, 4.6) : rnd(3.5, 5.8);
+    f.c = burst ? pick(PETALS) : pick(FALL_COLORS[season] || FALL_COLORS.summer);
+    return f;
+  }
+  function resetFog(f, anywhere) {
+    f.w = W * rnd(.7, 1.1); f.h = rnd(36, 64); f.y = H * rnd(.7, .9); f.vx = rnd(3, 8); f.a = rnd(.6, 1);
+    f.x = anywhere ? rnd(-f.w * .3, W) : -f.w;
+    return f;
+  }
+
+  function size() {
+    W = cv.clientWidth; H = cv.clientHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  }
+
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    if (now - lastT < FRAME_MS) return;
+    const dt = Math.min(.1, (now - lastT) / 1000);
+    lastT = now; t += dt;
+    const L = LOOK[phase] || LOOK.day;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    // лучи сквозь кроны
+    ctx.globalCompositeOperation = 'lighter';
+    for (const r of RAYS) {
+      const a = L.rayA * (.55 + .45 * Math.sin(t * .35 + r.k));
+      const x = r.x * W, sh = H * .32, gr = ctx.createLinearGradient(0, 0, 0, H * .9);
+      gr.addColorStop(0, `rgba(${L.ray},${a})`); gr.addColorStop(1, `rgba(${L.ray},0)`);
+      ctx.fillStyle = gr;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + r.w, 0); ctx.lineTo(x + r.w * 2.4 + sh, H * .9); ctx.lineTo(x + sh, H * .9); ctx.fill();
+    }
+    // пыльца днём, светлячки ночью
+    const spr = L.fire ? FIREFLY : POLLEN;
+    for (const m of motes) {
+      m.x += (m.vx + Math.sin(t * m.sp + m.ph) * 6) * dt; m.y += m.vy * dt;
+      if (m.y < -10 || m.x < -10 || m.x > W + 10) resetMote(m);
+      const a = L.fire ? Math.max(0, Math.sin(t * m.sp * 1.6 + m.ph)) : .55 + .3 * Math.sin(t * m.sp + m.ph);
+      if (a <= .02) continue;
+      const d = m.r * (L.fire ? 9 : 6);
+      ctx.globalAlpha = a;
+      ctx.drawImage(spr, m.x - d / 2, m.y - d / 2, d, d);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    // туман у земли
+    for (const f of fogs) {
+      f.x += f.vx * dt;
+      if (f.x > W) resetFog(f);
+      ctx.globalAlpha = L.fogA * f.a;
+      ctx.drawImage(FOG, f.x, f.y - f.h / 2, f.w, f.h);
+    }
+
+    // листья, лепестки, снежинки
+    ctx.globalAlpha = 1;
+    if (now < burstUntil && falls.length < N_FALLS + N_BURST && Math.random() < .35) falls.push(resetFall({}, true));
+    for (let i = falls.length - 1; i >= 0; i--) {
+      const f = falls[i];
+      f.y += f.vy * dt; f.x += f.vx * dt; f.rot += f.vr * dt;
+      if (f.y > H + 12 || f.x > W + 20) {
+        if (f.burst) { falls.splice(i, 1); continue; }
+        resetFall(f);
+      }
+      const x = f.x + Math.sin(t * 1.3 + f.ph) * f.sw;
+      ctx.fillStyle = f.c;
+      if (f.snow) { ctx.globalAlpha = .85; ctx.beginPath(); ctx.arc(x, f.y, f.size, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1; continue; }
+      ctx.save();
+      ctx.translate(x, f.y); ctx.rotate(f.rot); ctx.scale(1, Math.cos(t * f.flip + f.ph));
+      ctx.beginPath();
+      if (f.petal) ctx.ellipse(0, 0, f.size * .8, f.size * .55, 0, 0, 6.283);
+      else ctx.ellipse(0, 0, f.size, f.size * .42, 0, 0, 6.283);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function play() { if (running || document.hidden) return; running = true; lastT = performance.now(); raf = requestAnimationFrame(frame); }
+  function stop() { running = false; cancelAnimationFrame(raf); }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else play(); });
+  window.addEventListener('resize', () => { size(); fogs.forEach(f => resetFog(f, true)); });
+
+  return {
+    start() {
+      size();
+      for (let i = 0; i < N_MOTES; i++) motes.push(resetMote({}, true));
+      for (let i = 0; i < N_FALLS; i++) falls.push(resetFall({}, false, true));
+      for (let i = 0; i < 3; i++) fogs.push(resetFog({}, true));
+      play();
+    },
+    setPhase(p) { phase = p; },
+    burst(sec) { burstUntil = performance.now() + sec * 1000; },
+  };
+})();
+
+let lastTick = performance.now();
+function tick() {
+  const now = performance.now();
+  const dt = (now - lastTick) / 1000;
+  lastTick = now;
+  if (dt > 10) applyAbsence(dt, 'toast');   // телефон засыпал с открытой игрой
+  else addGold(D.income * dt);
+  updateTop();
+}
+
+function bindUI() {
+  const sun = $('sun');
+  sun.addEventListener('pointerdown', e => { e.preventDefault(); tapSun(e.clientX, e.clientY); });
+  sun.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === b.dataset.tab));
+    $('panels').scrollTop = 0;
+    bookDirty = achDirty = true;
+    renderBook(); renderAchievements();
+  }));
+  $('card').addEventListener('click', hideCard);
+  document.querySelectorAll('.mode button').forEach(b => b.addEventListener('click', () => {
+    G.bm = +b.dataset.m; updateFollowers(); updateTempleTab(); markDirty();
+  }));
+  $('sw-vib').addEventListener('click', () => { G.vib = G.vib ? 0 : 1; updateTempleTab(); if (G.vib) haptic('event'); markDirty(); });
+  $('btn-reset').addEventListener('click', askReset);
+  $('win-go').addEventListener('click', newEpoch);
+  $('win-later').addEventListener('click', () => $('win').classList.remove('show'));
+  $('btn-epoch').addEventListener('click', showWin);
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else if (loaded) checkDaily(); });
+  window.addEventListener('pagehide', saveNow);
+}
+
+let loaded = false;
+function start() {
+  initTelegram();
+  makeStars();
+  Live.start();
+  updateSky();
+  buildFollowers();
+  buildGifts();
+  bindUI();
+  loadAll(st => {
+    adopt(st);
+    loaded = true;
+    checkDaily();
+    showCompliment();
+    lastTick = performance.now();
+    setInterval(tick, 100);
+    setInterval(() => { updateBuild(true); updateFollowers(); updateGifts(); updateTempleTab(); updateBuffLine(); updateCrowd(); }, 250);
+    setInterval(() => { maybeEvent(); maybeCompliment(); checkAchievements(); renderBook(); renderAchievements(); }, 1000);
+    setInterval(updateSky, 60000);
+    setInterval(saveNow, 30000);
+    $('loading').classList.add('out');
+    setTimeout(() => $('loading').remove(), 600);
+  });
+}
+start();
+</script>
+</body>
+</html>
